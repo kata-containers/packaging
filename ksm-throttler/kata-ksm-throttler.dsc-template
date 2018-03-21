@@ -1,0 +1,16 @@
+Format: 3.0 (quilt)
+Source: kata-ksm-throttler
+Version: @VERSION@.git+@HASH@-@RELEASE@
+Section: devel
+Priority: optional
+Maintainer: clear containers team <cc-devel@lists.01.org>
+Standards-Version: 3.9.6
+Homepage: https://github.com/kata-containers/ksm-throttler
+Build-Depends: dh-make, git, ca-certificates, execstack, devscripts, debhelper, build-essential, dh-autoreconf, make, dh-modaliases, pkg-config, dh-systemd, systemd
+Debtransform-Tar: kata-ksm-throttler-@VERSION@.git+@HASH@.tar.gz
+
+Package: kata-ksm-throttler
+Architecture: amd64
+Description:
+ This project implements a Kernel Same-page Merging throttling daemon.
+ Its goal is to regulate KSM by dynamically modifying the KSM sysfs entries, in order to minimize memory duplication as fast as possible while keeping the KSM daemon load low.

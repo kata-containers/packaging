@@ -1,0 +1,74 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/default.mk
+export LANG=C
+%:
+	dh $@
+
+override_dh_auto_configure:
+	./configure \
+	--disable-bluez \
+	--disable-brlapi \
+	--disable-docs \
+	--disable-curses \
+	--disable-gtk \
+	--disable-opengl \
+	--disable-sdl \
+	--disable-spice \
+	--disable-vte \
+	--disable-vnc \
+	--disable-vnc-jpeg \
+	--disable-vnc-png \
+	--disable-vnc-sasl \
+	--disable-fdt \
+	--disable-glusterfs \
+	--disable-libiscsi \
+	--disable-libnfs \
+	--disable-libssh2 \
+	--disable-rbd \
+	--disable-bzip2 \
+	--disable-lzo \
+	--disable-snappy \
+	--disable-seccomp \
+	--disable-tpm \
+	--disable-slirp \
+	--disable-libusb \
+	--disable-usb-redir \
+	--disable-uuid \
+	--disable-debug-tcg \
+	--disable-qom-cast-debug \
+	--disable-tcg-interpreter \
+	--disable-tcmalloc \
+	--disable-curl \
+	--disable-rdma \
+	--disable-tools \
+	--disable-xen \
+	--disable-linux-aio \
+	--disable-virtfs \
+	--disable-attr \
+	--disable-cap-ng \
+	--enable-kvm \
+	--enable-vhost-net \
+	--target-list=x86_64-softmmu \
+	--libdir=/usr/lib64/qemu-vanilla \
+	--libexecdir=/usr/libexec/qemu-vanilla \
+	--datadir=/usr/share/qemu-vanilla \
+	--prefix=/usr
+
+override_dh_auto_build:
+	make
+
+override_dh_auto_install:
+	dh_auto_install
+	for file in $(CURDIR)/debian/qemu-vanilla/usr/bin/* ; do \
+		dir=$$(dirname $$file) ;\
+		bin=$$(basename $$file) ;\
+		new=$$(echo $$bin | sed -e 's/qemu-/qemu-vanilla-/g' -e 's/ivshmem-/ivshmem-vanilla-/g' -e 's/virtfs-/virtfs-vanilla-/g') ;\
+		mv $$file "$$dir"/"$$new" ; \
+	done
+
+override_dh_auto_test:
+	echo "Skip auto test"
+
+override_dh_auto_clean:
+	echo "Skip auto clean"
+

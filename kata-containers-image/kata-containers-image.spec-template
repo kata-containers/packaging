@@ -1,0 +1,36 @@
+%define version @VERSION@
+%define release @RELEASE@
+%define agent_sha @AGENT_SHA@
+%define rootfs_os @ROOTFS_OS@
+
+Name:           kata-containers-image
+Version:        %{version}
+Release:        %{release}.<B_CNT>
+License:        Artistic-1.0 BSD-3-Clause BSD-3-Clause-Kata BSD-4-Clause-UC GFDL-1.3 GPL-2.0 GPL-2.0+ GPL-3.0 GPL-3.0+ LGPL-2.0 LGPL-2.0+ LGPL-2.1 LGPL-3.0+ MIT MPL-2.0 Public-Domain 
+Summary:        Kata Containers Image
+Url:            https://download.clearlinux.org/
+Group:          image
+Source0:        kata-containers.tar.gz
+Source1:        LICENSE
+
+%global debug_package %{nil}
+
+%description
+Kata Containers rootfs image
+
+%install
+ImageDir=%{buildroot}/usr/share/kata-containers
+mkdir -p ${ImageDir}
+
+pushd %{_sourcedir}
+tar xfz kata-containers.tar.gz
+popd
+install -p %{_sourcedir}/kata-containers-image_%{rootfs_os}_agent_%{agent_sha}.img ${ImageDir}/
+ln -s /usr/share/kata-containers/kata-containers-image_%{rootfs_os}_agent_%{agent_sha}.img ${ImageDir}/kata-containers.img
+
+%files
+%if 0%{?suse_version}
+%dir /usr/share/kata-containers
+%endif
+/usr/share/kata-containers/kata-containers-image_%{rootfs_os}_agent_%{agent_sha}.img
+/usr/share/kata-containers/kata-containers.img

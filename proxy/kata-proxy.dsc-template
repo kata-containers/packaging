@@ -1,0 +1,18 @@
+format: 3.0 (quilt)
+Source: kata-proxy
+Version: @VERSION@+git.@HASH@-@RELEASE@
+Section: devel
+Priority: optional
+Maintainer: clear containers team <cc-devel@lists.01.org>
+Standards-Version: 3.9.6
+Build-Depends: dh-make, git, ca-certificates, execstack, devscripts, debhelper, build-essential, dh-autoreconf, make, dh-modaliases
+Homepage: https://clearlinux.org/features/clear-containers
+Debtransform-Tar: kata-proxy-@VERSION@+git.@HASH@.tar.gz
+
+Package: kata-proxy
+Architecture: amd64
+Description:
+ kata-proxy works alongside the Kata Containers runtime and shim to provide a VM-based OCI runtime solution.
+ kata-proxy is a daemon offering access to the hyperstart VM agent to both the runtime and shim processes.
+ Only a single instance of cc-proxy per host is necessary as it can be used for several different VMs.
+

@@ -1,0 +1,13 @@
+Source: kata-runtime
+Section: devel
+Priority: optional
+Maintainer: Kata containers team <https://github.com/kata-containers/>
+Standards-Version: 3.9.6
+Homepage: https://katacontainers.io
+Build-Depends: dh-make, git, ca-certificates, execstack, devscripts, debhelper, build-essential, dh-autoreconf, make, dh-modaliases
+Debtransform-Tar: cc-runtime-@VERSION@+git.@HASH@.tar.gz
+
+Package: kata-runtime
+Architecture: amd64
+Description:
+ An Open Containers Initiative (OCI) "runtime" that launches an Intel VT-x secured Kata Containers 3.0 hypervisor, rather than a standard Linux container.
