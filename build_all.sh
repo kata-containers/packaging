@@ -17,6 +17,10 @@ runtime/
 OSCRC="${HOME}/.oscrc"
 
 export BUILD_DISTROS=${BUILD_DISTROS:-xUbuntu_16.04}
+# Packaging use this variable instead of use git user value
+# On CI git user is not set
+export AUTHOR="user"
+export AUTHOR_EMAIL="user@example.com"
 
 cd $script_dir
 
