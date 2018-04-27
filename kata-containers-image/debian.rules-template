@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+override_dh_auto_build:
+
+override_dh_auto_install:
+	mkdir -p debian/kata-containers-image
+	tar xzf /usr/src/packages/SOURCES/kata-containers.tar.gz -C /usr/src/packages/SOURCES/
+	install -D /usr/src/packages/SOURCES/kata-containers-image_@ROOTFS_OS@_agent_@AGENT_SHA@.img ./debian/kata-containers-image/usr/share/kata-containers/
+	ln -s /usr/share/kata-containers/kata-containers-image_@ROOTFS_OS@_agent_@AGENT_SHA@.img \
+	./debian/kata-containers-image/usr/share/kata-containers/kata-containers-img

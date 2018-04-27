@@ -1,0 +1,14 @@
+Format: 3.0 (quilt)
+Source: kata-containers-image
+Version: @VERSION@-@RELEASE@
+Section: devel
+Priority: optional
+Maintainer: clear containers team <cc-devel@lists.01.org>
+Build-Depends: debhelper (>= 9), flex, bison
+Standards-Version: 3.9.6
+Homepage: https://clearlinux.org/features/clear-containers
+Debtransform-Tar: kata-containers.tar.gz
+
+Package: kata-containers-image
+Architecture: amd64
+Description: Kata containers image

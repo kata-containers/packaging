@@ -1,0 +1,4 @@
+/usr/share/clear-containers/vmlinux.container
+/usr/share/clear-containers/vmlinuz.container
+/usr/share/clear-containers/vmlinuz-@KERNEL_VERSION@
+/usr/share/clear-containers/vmlinuz-@KERNEL_VERSION@

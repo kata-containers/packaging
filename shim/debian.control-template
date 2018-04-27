@@ -1,0 +1,15 @@
+Source: kata-shim
+Section: devel
+Priority: optional
+Maintainer: Kata containers team <https://github.com/kata-containers/>
+Standards-Version: 3.9.6
+Homepage: https://katacontainers.io
+Build-Depends: debhelper (>= 9), git, ca-certificates, dh-modaliases, execstack, devscripts, dh-make
+Debtransform-Tar: kata-shim-@VERSION@+git.@HASH@.tar.gz
+
+Package: kata-shim
+Architecture: amd64
+Description:
+ kata-shim is a process spawned by the Intel VT-x secured Kata Containers 3.0 runtime per container workload.
+ The runtime provides the pid of the cc-shim process to containerd-shim on OCI create command.
+
