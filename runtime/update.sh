@@ -23,7 +23,7 @@ KSM_THROTTLER_RELEASE=$(cat ../ksm-throttler/release)
 KATA_CONTAINERS_IMAGE_RELEASE=$(cat ../kata-containers-image/release)
 APPORT_HOOK="source_cc-runtime.py"
 
-BUILD_DISTROS=${BUILD_DISTROS:-Fedora_27 xUbuntu_16.04 CentOS_7)
+BUILD_DISTROS=${BUILD_DISTROS:-Fedora_27 xUbuntu_16.04 CentOS_7}
 
 GENERATED_FILES=(kata-runtime.spec kata-runtime.dsc debian.control debian.rules _service)
 STATIC_FILES=(debian.compat)

@@ -32,4 +32,4 @@ sudo docker run \
 	-v "$packaging_repo_dir":${packaging_repo_dir} \
 	-v "$host_datadir":/var/packaging \
 	-v "$HOME/.oscrc":/root/.oscrc \
-	-it "$obs_image" bash -c "${packaging_repo_dir}/build_all.sh"
+	-i "$obs_image" bash -c "${packaging_repo_dir}/build_all.sh"
