@@ -55,7 +55,6 @@ Options:
 	     is specified.
 	-h : Display this help.
 	-m : Display options one per line (includes continuation characters).
-	-s : Generate options to build static
 
 Example:
 
@@ -223,7 +222,7 @@ main()
 
 	action=""
 
-	while getopts "dhms" opt
+	while getopts "dhm" opt
 	do
 		case "$opt" in
 			d)
@@ -237,9 +236,6 @@ main()
 
 			m)
 				action="multi"
-				;;
-			s)
-				static="true"
 				;;
 		esac
 	done
@@ -307,10 +303,6 @@ main()
 		qemu_options+=(security:--disable-static)
 	fi
 
-	if [ -n ${static} ]; then
-		qemu_options+=(misc:--static)
-	fi
-
 	# Not required as "-uuid ..." is always passed to the qemu binary
 	qemu_options+=(size:--disable-uuid)
 
@@ -355,7 +347,7 @@ main()
 	fi
 
 	# Support Ceph RADOS Block Device (RBD)
-	[ -z "${static}" ] && qemu_options+=(functionality:--enable-rbd)
+	qemu_options+=(functionality:--enable-rbd)
 
 	# In "passthrough" security mode
 	# (-fsdev "...,security_model=passthrough,..."), qemu uses a helper
@@ -405,7 +397,7 @@ main()
 	# SECURITY: Link binary as a Position Independant Executable,
 	# and take advantage of ASLR, making ROP attacks much harder to perform.
 	# (https://wiki.debian.org/Hardening)
-	[ -z "${static}" ] && _qemu_ldflags+=" -pie"
+	_qemu_ldflags+=" -pie"
 
 	# SECURITY: Disallow executing code on the stack.
 	_qemu_ldflags+=" -z noexecstack"
