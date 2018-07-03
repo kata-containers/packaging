@@ -8,6 +8,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+set -x
 
 readonly script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 readonly script_name="$(basename "${BASH_SOURCE[0]}")"
