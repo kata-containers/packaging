@@ -4,6 +4,7 @@
 #
 #SPDX-License-Identifier: Apache-2.0
 #
+set -x
 
 set -o errexit
 set -o nounset
