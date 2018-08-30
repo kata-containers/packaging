@@ -48,8 +48,7 @@ replace_list=(
 
 verify
 rm -rf kata-containers.tar.gz
-image_tarball=$(find . -name 'kata-containers-'"${VERSION}"'-*.tar.gz')
-[ -f "${image_tarball}" ] || die "image not found"
+image_tarball=$(find . -name 'kata-containers-'"${VERSION}"'-'"${kata_proxy_hash:0:11}"'-*.tar.gz') [ -f "${image_tarball}" ] || die "image not found"
 cp "${image_tarball}" kata-containers.tar.gz
 
 check_image
