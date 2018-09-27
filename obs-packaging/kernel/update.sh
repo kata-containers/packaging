@@ -40,7 +40,7 @@ STATIC_FILES=(debian.dirs debian.rules debian.compat debian.copyright)
 cli "$@"
 
 [ "$VERBOSE" == "true" ] && set -x
-PROJECT_REPO=${PROJECT_REPO:-home:${OBS_PROJECT}:${OBS_SUBPROJECT}/linux-container}
+PROJECT_REPO=${PROJECT_REPO:-home:${OBS_PROJECT}:${OBS_SUBPROJECT}/kernel}
 RELEASE=$(get_obs_pkg_release "${PROJECT_REPO}")
 ((RELEASE++))
 
