@@ -21,12 +21,8 @@ spec:
         lifecycle:
           preStop:
             exec:
-              command: ["sh", "-c", "/opt/kata-artifacts/scripts/remove-kata-crio.sh && kubectl label node $NODE_NAME --overwrite kata-containers.io/kata-runtime=cleanup"]
-        command: [ "sh", "-ce" ]
-        args:
-        - /opt/kata-artifacts/scripts/install-kata-crio.sh && kubectl label node $NODE_NAME kata-containers.io/kata-runtime=true;
-          kubectl get node $NODE_NAME --show-labels;
-          sleep infinity;
+              command: ["bash", "-c", "/opt/kata/scripts/kata-deploy.sh", "cleanup"]
+        command: [ "bash", "-c", "/opt/kata/scripts/kata-deploy.sh", "install" ]
         env:
         - name: NODE_NAME
           valueFrom:
