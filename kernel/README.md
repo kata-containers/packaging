@@ -2,7 +2,11 @@
 
 This document explains the steps to build a compatible kernel with Kata
 Containers. To do this use build-kernel.sh, this script automates the
-process to build a kernel for Kata Containers. 
+process to build a kernel for Kata Containers.
+
+## Requirements
+
+Go-lang version 1.10+ required by the setup.sh script.
 
 ## Setup kernel source code
 
