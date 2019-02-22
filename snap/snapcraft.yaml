@@ -13,7 +13,9 @@ parts:
   go:
     override-build: |
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      version="$(curl -sSL ${versions_url} | yq r - languages.golang.version)"
+      curl -LO ${versions_url}
+      version="$(yq r versions.yaml languages.golang.version)"
+      rm versions.yaml
       curl -LO https://dl.google.com/go/go${version}.src.tar.gz
       tar -xf go${version}.src.tar.gz --strip-components=1
       cd src && env GOROOT_BOOTSTRAP=$(go env GOROOT | tr -d '\n') ./make.bash
@@ -175,8 +177,10 @@ parts:
   kernel:
     override-pull: |
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      version="$(curl -sSL ${versions_url} | yq r - assets.kernel.version | tr -d v)"
-      url="$(curl -sSL ${versions_url} | yq r - assets.kernel.url)"
+      curl -LO ${versions_url}
+      version="$(yq r versions.yaml assets.kernel.version | tr -d v)"
+      url="$(yq r versions.yaml assets.kernel.url)"
+      rm versions.yaml
       curl -LO ${url}/linux-${version}.tar.xz
       tar -xf linux-${version}.tar.xz --strip-components=1
     after: [kernel-dump]
@@ -188,7 +192,9 @@ parts:
       - yq
     override-build: |
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      version="$(curl -sSL ${versions_url} | yq r - assets.kernel.version | tr -d v)"
+      curl -LO ${versions_url}
+      version="$(yq r versions.yaml assets.kernel.version | tr -d v)"
+      rm versions.yaml
       x_version="$(echo $version | sed -e 's|.[[:digit:]]*$||').x"
       case "$(arch)" in
         "x86_64")
@@ -251,8 +257,10 @@ parts:
   qemu:
     override-pull: |
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      branch="$(curl -sSL ${versions_url} | yq r - assets.hypervisor.qemu-lite.branch)"
-      url="$(curl -sSL ${versions_url} | yq r - assets.hypervisor.qemu-lite.url)"
+      curl -LO ${versions_url}
+      branch="$(yq r versions.yaml assets.hypervisor.qemu-lite.branch)"
+      url="$(yq r versions.yaml assets.hypervisor.qemu-lite.url)"
+      rm versions.yaml
       curl -LO ${url}/archive/${branch}.tar.gz
       tar -xf ${branch}.tar.gz --strip-components=1
     plugin: make
