@@ -12,17 +12,18 @@ confinement: classic
 parts:
   go:
     override-build: |
+      set -x
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      curl -LO ${versions_url}
+      wget ${versions_url}
       version="$(yq r versions.yaml languages.golang.version)"
       rm versions.yaml
-      curl -LO https://dl.google.com/go/go${version}.src.tar.gz
+      wget https://dl.google.com/go/go${version}.src.tar.gz
       tar -xf go${version}.src.tar.gz --strip-components=1
       cd src && env GOROOT_BOOTSTRAP=$(go env GOROOT | tr -d '\n') ./make.bash
     build-packages:
       - golang-go
       - g++
-      - curl
+      - wget
     build-snaps:
       - yq
     plugin: nil
@@ -177,22 +178,22 @@ parts:
   kernel:
     override-pull: |
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      curl -LO ${versions_url}
+      wget ${versions_url}
       version="$(yq r versions.yaml assets.kernel.version | tr -d v)"
       url="$(yq r versions.yaml assets.kernel.url)"
       rm versions.yaml
-      curl -LO ${url}/linux-${version}.tar.xz
+      wget ${url}/linux-${version}.tar.xz
       tar -xf linux-${version}.tar.xz --strip-components=1
     after: [kernel-dump]
     plugin: kernel
     build-packages:
       - libelf-dev
-      - curl
+      - wget
     build-snaps:
       - yq
     override-build: |
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      curl -LO ${versions_url}
+      wget ${versions_url}
       version="$(yq r versions.yaml assets.kernel.version | tr -d v)"
       rm versions.yaml
       x_version="$(echo $version | sed -e 's|.[[:digit:]]*$||').x"
@@ -257,11 +258,11 @@ parts:
   qemu:
     override-pull: |
       versions_url=https://raw.githubusercontent.com/kata-containers/runtime/${SNAPCRAFT_PROJECT_VERSION}/versions.yaml
-      curl -LO ${versions_url}
+      wget ${versions_url}
       branch="$(yq r versions.yaml assets.hypervisor.qemu-lite.branch)"
       url="$(yq r versions.yaml assets.hypervisor.qemu-lite.url)"
       rm versions.yaml
-      curl -LO ${url}/archive/${branch}.tar.gz
+      wget ${url}/archive/${branch}.tar.gz
       tar -xf ${branch}.tar.gz --strip-components=1
     plugin: make
     after: [qemu-scripts-dump, qemu-patches-dump]
@@ -277,7 +278,7 @@ parts:
       - libcap-dev
       - libattr1-dev
       - libfdt-dev
-      - curl
+      - wget
     build-snaps:
       - yq
     override-build: |
