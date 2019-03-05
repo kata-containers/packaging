@@ -1,0 +1,37 @@
+From 444fecd6a0074a27e4f68869b6f136774eec0af0 Mon Sep 17 00:00:00 2001
+From: Julio Montes <julio.montes@intel.com>
+Date: Wed, 6 Mar 2019 07:34:50 -0600
+Subject: [PATCH] Don't check ND_REGION_PAGEMAP
+
+DAX is disabled because the kernel doesn't know the namespace
+information of the DAX device (kata-containers.img). As a temporal solution
+to this issue, kernel shouldn't check the ND_REGION_PAGEMAP bit.
+
+Signed-off-by: Julio Montes <julio.montes@intel.com>
+---
+ drivers/nvdimm/namespace_devs.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/nvdimm/namespace_devs.c b/drivers/nvdimm/namespace_devs.c
+index 4a426625..dc6715bb 100644
+--- a/drivers/nvdimm/namespace_devs.c
++++ b/drivers/nvdimm/namespace_devs.c
+@@ -137,15 +137,11 @@ bool nd_is_uuid_unique(struct device *dev, u8 *uuid)
+ 
+ bool pmem_should_map_pages(struct device *dev)
+ {
+-	struct nd_region *nd_region = to_nd_region(dev->parent);
+ 	struct nd_namespace_io *nsio;
+ 
+ 	if (!IS_ENABLED(CONFIG_ZONE_DEVICE))
+ 		return false;
+ 
+-	if (!test_bit(ND_REGION_PAGEMAP, &nd_region->flags))
+-		return false;
+-
+ 	if (is_nd_pfn(dev) || is_nd_btt(dev))
+ 		return false;
+ 
+-- 
+2.17.2
+
