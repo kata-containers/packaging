@@ -16,8 +16,8 @@ containerd_conf_file_backup="${containerd_conf_file}.bak"
 shim_binary="containerd-shim-kata-v2"
 shim_file="/usr/local/bin/${shim_binary}"
 shim_backup="/usr/local/bin/${shim_binary}.bak"
-# If we fail for any reason a message will be displayed
-die() {
+# If we fail for any reason a message will be displayed and exit
+function print_errmsg_and_exit() {
         msg="$*"
         echo "ERROR: $msg" >&2
         exit 1
@@ -30,7 +30,7 @@ function print_usage() {
 function get_container_runtime() {
 	local runtime=$(kubectl describe node $NODE_NAME)
 	if [ "$?" -ne 0 ]; then
-                die "invalid node name"
+                print_errmsg_and_exit "invalid node name"
 	fi
 	echo "$runtime" | awk -F'[:]' '/Container Runtime Version/ {print $2}' | tr -d ' '
 }
@@ -187,7 +187,7 @@ function main() {
 	# script requires that user is root
 	euid=`id -u`
 	if [[ $euid -ne 0 ]]; then
-	   die  "This script must be run as root"
+	   print_errmsg_and_exit  "This script must be run as root"
 	fi
 
 	runtime=$(get_container_runtime)
@@ -200,7 +200,7 @@ function main() {
 	action=${1:-}
 	if [ -z $action ]; then
 		print_usage
-		die "invalid arguments"
+		print_errmsg_and_exit "invalid arguments"
 	fi
 
 	# only install / remove / update if we are dealing with CRIO or containerd

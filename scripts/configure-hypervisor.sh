@@ -48,14 +48,14 @@ recognised_tags=(
 )
 
 # Display message to stderr and exit indicating script failed.
-die() {
+function print_err() {
 	local msg="$*"
 	echo >&2 "$script_name: ERROR: $msg"
 	exit 1
 }
 
 # Display usage to stdout.
-usage() {
+function usage() {
 	cat <<EOT
 Overview:
 
@@ -81,7 +81,7 @@ Example:
 EOT
 }
 
-show_tags_header() {
+function show_tags_header() {
 	local keys
 	local key
 	local value
@@ -103,27 +103,27 @@ EOT
 	printf "#\n\n"
 }
 
-check_tag() {
+function check_tag() {
 	local tag="$1"
 	local entry="$2"
 
-	[ -z "$tag" ] && die "no tag for entry '$entry'"
-	[ -z "$entry" ] && die "no entry for tag '$tag'"
+	[ -z "$tag" ] && print_err "no tag for entry '$entry'"
+	[ -z "$entry" ] && print_err "no entry for tag '$tag'"
 
 	value="${recognised_tags[$tag]}"
 
 	# each tag MUST have a description
 	[ -n "$value" ] && return
 
-	die "invalid tag '$tag' found for entry '$entry'"
+	print_err "invalid tag '$tag' found for entry '$entry'"
 }
 
-check_tags() {
+function check_tags() {
 	local tags="$1"
 	local entry="$2"
 
-	[ -z "$tags" ] && die "entry '$entry' doesn't have any tags"
-	[ -z "$entry" ] && die "no entry for tags '$tags'"
+	[ -z "$tags" ] && print_err "entry '$entry' doesn't have any tags"
+	[ -z "$entry" ] && print_err "no entry for tags '$tags'"
 
 	tags=$(echo "$tags" | tr ',' '\n')
 
@@ -144,7 +144,7 @@ check_tags() {
 # $2: (optional) "multi" - show values across multiple lines,
 #    "dump" - show full hash values. Any other value results in the
 #    options being displayed on a single line.
-show_array() {
+function show_array() {
 	local action="$1"
 	local _array=("$@")
 	_array=("${_array[@]:1}")
@@ -160,12 +160,12 @@ show_array() {
 	[ "$action" = "dump" ] && show_tags_header
 
 	for entry in "${_array[@]}"; do
-		[ -z "$entry" ] && die "found empty entry"
+		[ -z "$entry" ] && print_err "found empty entry"
 
 		tags=$(echo "$entry" | cut -s -d: -f1)
 		elem=$(echo "$entry" | cut -s -d: -f2-)
 
-		[ -z "$elem" ] && die "no option for entry '$entry'"
+		[ -z "$elem" ] && print_err "no option for entry '$entry'"
 
 		check_tags "$tags" "$entry"
 
@@ -190,7 +190,7 @@ show_array() {
 	[ "$one_line" = yes ] && echo
 }
 
-generate_qemu_options() {
+function generate_qemu_options() {
 	#---------------------------------------------------------------------
 	# Disabled options
 
@@ -452,7 +452,7 @@ generate_qemu_options() {
 }
 
 # Entry point
-main() {
+function main() {
 	action=""
 
 	while getopts "dhms" opt; do
@@ -477,27 +477,27 @@ main() {
 
 	shift $((OPTIND - 1))
 
-	[ -z "$1" ] && die "need hypervisor name"
+	[ -z "$1" ] && print_err "need hypervisor name"
 	hypervisor="$1"
 
 	local qemu_version_file="VERSION"
-	[ -f ${qemu_version_file} ] || die "QEMU version file '$qemu_version_file' not found"
+	[ -f ${qemu_version_file} ] || print_err "QEMU version file '$qemu_version_file' not found"
 
 	local qemu_version_major=$(cut -d. -f1 "${qemu_version_file}")
 	local qemu_version_minor=$(cut -d. -f2 "${qemu_version_file}")
 
 	[ -n "${qemu_version_major}" ] ||
-		die "cannot determine qemu major version from file $qemu_version_file"
+		print_err "cannot determine qemu major version from file $qemu_version_file"
 	[ -n "${qemu_version_minor}" ] ||
-		die "cannot determine qemu minor version from file $qemu_version_file"
+		print_err "cannot determine qemu minor version from file $qemu_version_file"
 
 	local gcc_version_major=$(gcc -dumpversion | cut -f1 -d.)
 	local gcc_version_minor=$(gcc -dumpversion | cut -f2 -d.)
 
 	[ -n "${gcc_version_major}" ] ||
-		die "cannot determine gcc major version, please ensure it is installed"
+		print_err "cannot determine gcc major version, please ensure it is installed"
 	[ -n "${gcc_version_minor}" ] ||
-		die "cannot determine gcc minor version, please ensure it is installed"
+		print_err "cannot determine gcc minor version, please ensure it is installed"
 
 	# Generate qemu options
 	generate_qemu_options

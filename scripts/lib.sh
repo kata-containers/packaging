@@ -2,13 +2,12 @@ export GOPATH=${GOPATH:-${HOME}/go}
 readonly kata_arch_sh="${GOPATH}/src/github.com/kata-containers/tests/.ci/kata-arch.sh"
 hub_bin="hub-bin"
 
-get_kata_arch() {
+function get_kata_arch() {
 	go get -u github.com/kata-containers/tests || true
-	[ -f "${kata_arch_sh}" ] || die "Not found $kata_arch_sh"
+	[ -f "${kata_arch_sh}" ] || print_err "Not found $kata_arch_sh"
 }
 
-install_yq() {
-	GOPATH=${GOPATH:-${HOME}/go}
+function install_yq() {
 	local yq_path="${GOPATH}/bin/yq"
 	local yq_pkg="github.com/mikefarah/yq"
 	[ -x "${GOPATH}/bin/yq" ] && return
@@ -30,11 +29,10 @@ install_yq() {
 	chmod +x "${yq_path}"
 }
 
-get_from_kata_deps() {
+function get_from_kata_deps() {
 	local dependency="$1"
 	local branch="${2:-master}"
 	local runtime_repo="github.com/kata-containers/runtime"
-	GOPATH=${GOPATH:-${HOME}/go}
 	# We will not query the local versions.yaml file here to allow releases to
 	# always get the version from the committed tree. For our CI,
 	# .ci/install_kata_kernel.sh file in tests repository will pass the kernel
@@ -54,25 +52,25 @@ get_from_kata_deps() {
 	echo "$result"
 }
 
-die() {
+function print_err() {
 	echo >&2 "ERROR: $*"
 	exit 1
 }
 
-info() {
+function print_info() {
 	echo >&2 "INFO: $*"
 }
 
-get_repo_hash() {
+function get_repo_hash() {
 	local repo_dir=${1:-}
-	[ -d "${repo_dir}" ] || die "${repo_dir} is not a directory"
+	[ -d "${repo_dir}" ] || print_err "${repo_dir} is not a directory"
 	pushd "${repo_dir}" >>/dev/null
 	git rev-parse --verify HEAD
 	popd >>/dev/null
 }
 
-build_hub() {
-	info "Get hub"
+function build_hub() {
+	print_info "Get hub"
 
 	if cmd=$(command -v hub); then
 		hub_bin="${cmd}"
@@ -91,7 +89,7 @@ build_hub() {
 	popd >>/dev/null
 }
 
-get_kata_hash_from_tag() {
+function get_kata_hash_from_tag() {
 	repo=$1
 	git ls-remote --tags "https://github.com/${project}/${repo}.git" | grep "refs/tags/${kata_version}^{}" | awk '{print $1}'
 }

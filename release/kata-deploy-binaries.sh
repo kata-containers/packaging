@@ -21,7 +21,7 @@ push=false
 export GOPATH
 workdir="${WORKDIR:-$PWD}"
 
-exit_handler() {
+function exit_handler() {
 	[ -d "${tmp_dir}" ] || sudo rm -rf "${tmp_dir}"
 }
 trap exit_handler EXIT
@@ -32,17 +32,17 @@ projects=(
 	shim
 )
 
-die() {
+function print_err() {
 	msg="$*"
 	echo "ERROR: ${msg}" >&2
 	exit 1
 }
 
-info() {
+function print_info() {
 	echo "INFO: $*"
 }
 
-usage() {
+function usage() {
 	return_code=${1:-0}
 	cat <<EOT
 This script is used as part of the ${project} release process.
@@ -68,18 +68,18 @@ EOT
 }
 
 #Install guest image/initrd asset
-install_image() {
+function install_image() {
 	image_destdir="${destdir}/${prefix}/share/kata-containers/"
-	info "Create image"
+	print_info "Create image"
 	image_tarball=$(find . -name 'kata-containers-'"${kata_version}"'-*.tar.gz')
 	[ -f "${image_tarball}" ] || "${script_dir}/../obs-packaging/kata-containers-image/build_image.sh" -v "${kata_version}"
 	image_tarball=$(find . -name 'kata-containers-'"${kata_version}"'-*.tar.gz')
-	[ -f "${image_tarball}" ] || die "image not found"
-	info "Install image in destdir ${image_tarball}"
+	[ -f "${image_tarball}" ] || print_err "image not found"
+	print_info "Install image in destdir ${image_tarball}"
 	mkdir -p "${image_destdir}"
 	tar xf "${image_tarball}" -C "${image_destdir}"
 	pushd "${destdir}/${prefix}/share/kata-containers/" >>/dev/null
-	info "Create image default symlinks"
+	print_info "Create image default symlinks"
 	image=$(find . -name 'kata-containers-image*.img')
 	initrd=$(find . -name 'kata-containers-initrd*.initrd')
 	ln -sf "${image}" kata-containers.img
@@ -88,7 +88,7 @@ install_image() {
 }
 
 #Install kernel asset
-install_kernel() {
+function install_kernel() {
 	go get "github.com/${project}/packaging" || true
 	pushd ${GOPATH}/src/github.com/${project}/packaging >>/dev/null
 	git checkout "${kata_version}-kernel-config" ||
@@ -96,34 +96,34 @@ install_kernel() {
 	popd >>/dev/null
 	pushd "${script_dir}/../kernel" >>/dev/null
 
-	info "build kernel"
+	print_info "build kernel"
 	./build-kernel.sh setup
 	./build-kernel.sh build
-	info "install kernel"
+	print_info "install kernel"
 	DESTDIR="${destdir}" PREFIX="${prefix}" ./build-kernel.sh install
 	popd >>/dev/null
 }
 
 # Install static qemu asset
-install_qemu() {
-	info "build static qemu"
+function install_qemu() {
+	print_info "build static qemu"
 	"${script_dir}/../static-build/qemu/build-static-qemu.sh"
-	info "Install static qemu"
+	print_info "Install static qemu"
 	tar xf kata-qemu-static.tar.gz -C "${destdir}"
 }
 
 # Install static firecracker asset
-install_firecracker() {
-	info "build static firecracker"
+function install_firecracker() {
+	print_info "build static firecracker"
 	[ -f "firecracker/firecracker-static" ] || "${script_dir}/../static-build/firecracker/build-static-firecracker.sh"
-	info "Install static firecracker"
+	print_info "Install static firecracker"
 	mkdir -p "${destdir}/opt/kata/bin/"
 	sudo install -D --owner root --group root --mode 0744  firecracker/firecracker-static "${destdir}/opt/kata/bin/firecracker"
 
 }
 
 #Install all components that are not assets
-install_kata_components() {
+function install_kata_components() {
 	for p in "${projects[@]}"; do
 		echo "Download ${p}"
 		go get "github.com/${project}/$p" || true
@@ -162,7 +162,7 @@ EOT
 	popd
 }
 
-main() {
+function main() {
 	while getopts "hpw:" opt; do
 		case $opt in
 		h) usage 0 ;;
@@ -174,10 +174,10 @@ main() {
 
 	kata_version=${1:-}
 	[ -n "${kata_version}" ] || usage 1
-	info "Requested version: ${kata_version}"
+	print_info "Requested version: ${kata_version}"
 
 	destdir="${workdir}/kata-static-${kata_version}-$(uname -m)"
-	info "DESTDIR ${destdir}"
+	print_info "DESTDIR ${destdir}"
 	mkdir -p "${destdir}"
 	install_image
 	install_kata_components
