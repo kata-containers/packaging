@@ -73,18 +73,21 @@ create_repos_xml_nodes() {
 		local name
 		local project
 		local repositories
-		name=$(echo "$entry" | awk -F"::" '{print $1;}')
-		project=$(echo "$entry" | awk -F"::" '{print $2;}')
-		repositories=$(echo "$entry" | awk -F"::" '{print $3;}')
+		name=$(echo "$entry" | awk -F"=" '{print $1;}')
+		projects=$(echo "$entry" | awk -F"=" '{print $2;}')
 
 		[ -z "$name" ] && die "no name for entry '$entry'"
-		[ -z "$project" ] && die "no project for entry '$entry'"
-		[ -z "$repositories" ] && die "no repository for entry '$entry'"
+		[ -z "$projects" ] && die "no projects for entry '$entry'"
 
 		echo "  <repository name=\"${name}\">"
-
-		echo "${repositories}"| tr ',' '\n' | while read -r repository; do
-			echo "    <path project=\"${project}\" repository=\"${repository}\"/>"
+		for p in ${projects//&&/ } ; do
+			project=$(echo "$p" | awk -F"::" '{print $1;}')
+			repositories=$(echo "$p" | awk -F"::" '{print $2;}')
+			[ -z "$project" ] && die "no project for entry '$entry'"
+			[ -z "$repositories" ] && die "no repository for entry '$entry'"
+			echo "${repositories}"| tr ',' '\n' | while read -r repository; do
+				echo "    <path project=\"${project}\" repository=\"${repository}\"/>"
+			done
 		done
 
 		arch_target_obs=${arch_target}
@@ -123,6 +126,7 @@ $(create_maintainers_xml_nodes)
 $(create_repos_xml_nodes)
 </project>
 EOT
+cat meta_project.xml
 }
 
 usage() {
