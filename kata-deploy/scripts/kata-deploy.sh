@@ -52,6 +52,15 @@ function install_artifacts() {
 	echo "copying kata artifacts onto host"
 	cp -a /opt/kata-artifacts/opt/kata/* /opt/kata/
 	chmod +x /opt/kata/bin/*
+	if [ "$ENABLE_DEBUG" = true ]; then
+		for shim in ${shims[@]}; do
+			conf="/opt/kata/share/defaults/kata-containers/configuration-${shim}.toml"
+			cp $conf /tmp/configuration.toml
+			sed -i -e 's/^kernel_params = "\(.*\)"/kernel_params = "\1 agent.log=debug agent.debug_console initcall_debug"/g' /tmp/configuration.toml
+			sed -i -e 's/^# *\(enable_debug\).*=.*$/\1 = true/g' /tmp/configuration.toml
+			awk '{if (/^\[proxy\.kata\]/) {got=1}; if (got == 1 && /^.*enable_debug/) {print "#enable_debug = true"; got=0; next; } else {print}}' /tmp/configuration.toml > $conf
+		done
+	fi
 }
 
 function configure_cri_runtime() {
