@@ -11,9 +11,47 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo setup
-  displayName: 'setup CI'
+- task: DockerInstaller@0
+  displayName: 'Install Docker'
 
-- script: |
-    echo This is an initial CI job
-  displayName: 'Run CI'
+- bash: |
+   sudo apt-get update
+   sudo apt-get install  git
+   git config --global user.email "azure-pipeline@kata.io"
+   git config --global user.name "azure-pipeline"
+  displayName: Setup
+
+- bash: |
+   # FIXME: Added just for debug
+   export DEBUG=true
+   set -x
+   # This is set by azure, but we use the same variable
+   export AGENT_VERSION=""
+   # this should exist to download versions.yaml
+   # FIXME
+   mkdir -p /home/vsts/go/src/github.com/kata-containers/runtime/
+   # Kata branch to build
+   BRANCH=master
+   # Name of OBS branch to to push
+   OBS_BRANCH="packaging-PR-$(System.PullRequest.PullRequestId)"
+   # Push to anywere, variable used by release scripts to push
+   PUSH=1
+   export PUSH
+   export BRANCH
+   export OBS_BRANCH
+   export OBS_SUBPROJECT="test:$(uname -m):${OBS_BRANCH}"
+   # Export in all pipeline tasks
+   #echo "##vso[task.setvariable variable=OBS_SUBPROJECT;]${OBS_SUBPROJECT}"
+   cd obs-packaging  || exit 1
+   echo "Building for head gen versions ..."
+   ./gen_versions_txt.sh --head "${BRANCH}"
+   # print versions just for debug/info
+   cat versions.txt
+   export NEW_VERSION=$(curl -s -L https://raw.githubusercontent.com/kata-containers/runtime/${BRANCH}/VERSION)
+   script -qefc bash -c './create-repo-branch.sh ${OBS_BRANCH}'
+   script -qefc bash -c './build_from_docker.sh ${NEW_VERSION}'
+  displayName: 'Build in OBS'
+
+  env:
+    OBS_USER: $(OBS_USER)
+    OBS_PASS: $(OBS_PASS)

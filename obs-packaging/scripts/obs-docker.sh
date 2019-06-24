@@ -11,6 +11,8 @@ setup_oscrc() {
 	# oscrc exists at different places on different distros
 	[ -f "${HOME}/.config/osc/oscrc" ] && OSCRC="${HOME}/.config/osc/oscrc"
 	OSCRC=${OSCRC:-"${HOME}/.oscrc"}
+	(
+	 set +x
 	OBS_API="https://api.opensuse.org"
 
 	if [ -n "${OBS_USER:-}" ] && [ -n "${OBS_PASS:-}" ] && [ ! -e "${OSCRC}" ]; then
@@ -25,10 +27,12 @@ pass = ${OBS_PASS}
 eom
 	fi
 
+	) >> /dev/null
 	if [ ! -e "${OSCRC}" ]; then
 		echo "${OSCRC}, please  do 'export OBS_USER=your_user ; export OBS_PASS=your_pass' to configure osc for first time."
 		exit 1
 	fi
+	echo "OK - osc configured"
 }
 
 docker_run() {
