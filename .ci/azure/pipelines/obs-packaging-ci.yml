@@ -39,7 +39,7 @@ steps:
    export PUSH
    export BRANCH
    export OBS_BRANCH
-   export OBS_SUBPROJECT="test:$(uname -m):${OBS_BRANCH}"
+   export OBS_SUBPROJECT="ci:$(uname -m):${OBS_BRANCH}"
    # Export in all pipeline tasks
    #echo "##vso[task.setvariable variable=OBS_SUBPROJECT;]${OBS_SUBPROJECT}"
    cd obs-packaging  || exit 1
@@ -48,7 +48,8 @@ steps:
    # print versions just for debug/info
    cat versions.txt
    export NEW_VERSION=$(curl -s -L https://raw.githubusercontent.com/kata-containers/runtime/${BRANCH}/VERSION)
-   script -qefc bash -c './create-repo-branch.sh ${OBS_BRANCH}'
+   env
+   script -qefc bash -c './create-repo-branch.sh --ci ${OBS_BRANCH}'
    script -qefc bash -c './build_from_docker.sh ${NEW_VERSION}'
   displayName: 'Build in OBS'
 
