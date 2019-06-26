@@ -12,7 +12,11 @@ curl -sOL ${KATA_URL}/${KATA_FILE} && \
 mkdir -p /opt/kata-artifacts && \
 tar xvf ${KATA_FILE} -C /opt/kata-artifacts/ && \
 chown -R root:root /opt/kata-artifacts/ && \
-rm ${KATA_FILE}
+rm ${KATA_FILE} && \
+curl -sOL https://s3-eu-west-1.amazonaws.com/record-query/record-query/x86_64-unknown-linux-musl/rq && \
+chmod +x rq && \
+mkdir -p /opt/rq/bin && \
+mv rq /opt/rq/bin
 
 RUN \
 curl -Lso /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${KUBE_ARCH}/kubectl && \

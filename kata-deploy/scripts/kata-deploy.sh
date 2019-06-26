@@ -120,35 +120,54 @@ function configure_containerd() {
 	# Configure containerd to use Kata:
 	echo "Add Kata Containers as a supported runtime for containerd"
 
-	mkdir -p /etc/containerd/
-
 	if [ -f "$containerd_conf_file" ]; then
 		cp "$containerd_conf_file" "$containerd_conf_file_backup"
+	else
+		mkdir -p "${containerd_conf_file%/*}"
+		touch "$containerd_conf_file"
 	fi
-	# TODO: While there isn't a default here anyway, it'd probably be best to
-	#  add sed magic to insert into appropriate location if config.toml already exists
-	# https://github.com/kata-containers/packaging/issues/307
-	cat <<EOT | tee "$containerd_conf_file"
-[plugins]
-  [plugins.cri]
-   [plugins.cri.containerd]
-     [plugins.cri.containerd.runtimes.kata]
-        runtime_type = "io.containerd.kata.v2"
-        [plugins.cri.containerd.runtimes.kata.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration.toml"
-     [plugins.cri.containerd.runtimes.kata-fc]
-        runtime_type = "io.containerd.kata-fc.v2"
-        [plugins.cri.containerd.runtimes.kata-fc.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-fc.toml"
-     [plugins.cri.containerd.runtimes.kata-qemu]
-        runtime_type = "io.containerd.kata-qemu.v2"
-        [plugins.cri.containerd.runtimes.kata-qemu.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-qemu.toml"
-     [plugins.cri.containerd.runtimes.kata-nemu]
-        runtime_type = "io.containerd.kata-nemu.v2"
-        [plugins.cri.containerd.runtimes.kata-nemu.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-nemu.toml"
-EOT
+
+	#rq doesn't seem to work properly when source and destination are the same file
+	#so use a tmp copy as the source
+	containerd_conf_file_tmp="${containerd_conf_file}.tmp"
+	cp "${containerd_conf_file}" "${containerd_conf_file_tmp}"
+	/opt/rq/bin/rq -t -T 'defaultsDeep
+{
+  "plugins": {
+    "cri": {
+      "containerd": {
+        "runtimes": {
+          "kata": {
+            "runtime_type": "io.containerd.kata.v2",
+            "options": {
+              "ConfigPath": "/usr/share/defaults/kata-containers/configuration.toml"
+            }
+          },
+          "kata-fc": {
+            "runtime_type": "io.containerd.kata-fc.v2",
+            "options": {
+              "ConfigPath": "/usr/share/defaults/kata-containers/configuration-fc.toml"
+            }
+          },
+          "kata-nemu": {
+            "runtime_type": "io.containerd.kata-nemu.v2",
+            "options": {
+              "ConfigPath": "/usr/share/defaults/kata-containers/configuration-nemu.toml"
+            }
+          },
+          "kata-qemu": {
+            "runtime_type": "io.containerd.kata-qemu.v2",
+            "options": {
+              "ConfigPath": "/usr/share/defaults/kata-containers/configuration-qemu.toml"
+            }
+          }
+        }
+      }
+    }
+  }
+}' < "$containerd_conf_file_tmp" > "$containerd_conf_file"
+	rm "$containerd_conf_file_tmp"
+
 	#Currently containerd has an assumption on the location of the shimv2 implementation
 	#Until support is added (see https://github.com/containerd/containerd/issues/3073),
     #create a link in /usr/local/bin/ to the v2-shim implementation in /opt/kata/bin.
