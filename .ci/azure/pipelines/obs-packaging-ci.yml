@@ -11,7 +11,7 @@ jobs:
 - job: packages
   timeoutInMinutes: 0
   pool:
-  vmImage: 'ubuntu-latest'
+    vmImage: 'ubuntu-latest'
   steps:
   # azure docker installation task
   # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/tool/docker-installer?view=azure-devops 
