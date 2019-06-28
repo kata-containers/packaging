@@ -23,14 +23,14 @@ jobs:
       sudo apt-get install -y git
       git config --global user.email "azure-pipeline@kata.io"
       git config --global user.name "azure-pipeline"
-      displayName: 'Setup'
+    displayName: 'Setup'
 
   - bash: |
       # This is set by azure, but we use the same variable
       export AGENT_VERSION=""
       script -qefc bash -c '.ci/packaging/request_to_obs.sh'
       # Kata branch to build
-      displayName: 'Request build to OBS'
+    displayName: 'Request build to OBS'
 
     env:
       CI: true
@@ -43,7 +43,7 @@ jobs:
       echo "Wait for packages from ${OBS_SUBPROJECT}"
       [ "${OBS_SUBPROJECT}" != "" ] || { echo "OBS_SUBPROJECT"; exit 1; }
       script -qefc bash -c './obs-packaging/wait-obs.sh'
-      displayName: 'Wait for packages are ready'
+    displayName: 'Wait for packages are ready'
     env:
       USE_DOCKER: true
       CI: $(CI)
