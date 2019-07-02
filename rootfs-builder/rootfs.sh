@@ -4,7 +4,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -o errexit
+set -o pipefail
+set -o errtrace
 
 [ -n "$DEBUG" ] && set -x
 
@@ -12,16 +14,20 @@ script_name="${0##*/}"
 script_dir="$(dirname $(readlink -f $0))"
 AGENT_VERSION=${AGENT_VERSION:-}
 GO_AGENT_PKG=${GO_AGENT_PKG:-github.com/kata-containers/agent}
+GO_RUNTIME_PKG=${GO_RUNTIME_PKG:-github.com/kata-containers/runtime}
 AGENT_BIN=${AGENT_BIN:-kata-agent}
 AGENT_INIT=${AGENT_INIT:-no}
 KERNEL_MODULES_DIR=${KERNEL_MODULES_DIR:-""}
 OSBUILDER_VERSION="unknown"
 DOCKER_RUNTIME=${DOCKER_RUNTIME:-runc}
-GO_VERSION=
+GO_VERSION="null"
+#https://github.com/kata-containers/tests/blob/master/.ci/jenkins_job_build.sh
+KATA_BRANCH=${KATA_BRANCH:-${branch:-}}
 export GOPATH=${GOPATH:-${HOME}/go}
 
 lib_file="${script_dir}/../scripts/lib.sh"
 source "$lib_file"
+
 
 # Default architecture
 ARCH=$(uname -m)
@@ -247,22 +253,37 @@ error_handler()
 
 detect_go_version()
 {
+	info "Detecting agent go version"
 	typeset -r yq=$(command -v yq || command -v ${GOPATH}/bin/yq)
 	[ -z "$yq" ] && die "'yq' application not found (needed to parsing minimum Go version required)"
 
-	local runtimeRevision=
+	local runtimeRevision=""
 
-	if [ "${AGENT_VERSION:-master}" == "master" ]; then
-		# This matches both AGENT_VERSION == "" and AGENT_VERSION == "master"
-		runtimeRevision="master"
+	# Detect runtime revision by fetching the agent's VERSION file
+	local runtime_version_url="https://raw.githubusercontent.com/kata-containers/agent/${AGENT_VERSION:-master}/VERSION"
+	info "Detecting runtime version using ${runtime_version_url}"
+
+	if runtimeRevision="$(curl -fsSL ${runtime_version_url})"; then
+		[ -n "${runtimeRevision}" ] || die "failed to get agent version"
+		typeset -r runtimeVersionsURL="https://raw.githubusercontent.com/kata-containers/runtime/${runtimeRevision}/versions.yaml"
+		echo "Getting golang version from ${runtimeVersionsURL}"
+		GO_VERSION="$(curl -fsSL "$runtimeVersionsURL" | $yq r - "languages.golang.version")"
 	else
-		# Detect runtime revision by fetching the agent's VERSION file
-		runtimeRevision="$(curl -fsSL https://raw.githubusercontent.com/kata-containers/agent/${AGENT_VERSION:-master}/VERSION)"
-		[ -z "$runtimeRevision" ] && die "Could not detect the agent version for the given AGENT_VERSION='${AGENT_VERSION:-master}'"
-	fi
+		info "Agent version has not match with a runtime version, assumming it is a PR"
+		if [ ! -d "${GOPATH}/src/${GO_RUNTIME_PKG}" ];then
+			info "Getting kata runtime code ${GO_RUNTIME_PKG}"
+			go get "${GO_RUNTIME_PKG}"
+			# For checkout to a branch for kata branch
+			if [ "${KATA_BRANCH}" != "" ] ; then
+				info "Checkout to kata runtime ${KATA_BRANCH}"
+				git --work-tree "${GOPATH}/src/${GO_RUNTIME_PKG}" checkout "${KATA_BRANCH}"
+			fi
+		fi
 
-	typeset -r runtimeVersionsURL="https://raw.githubusercontent.com/kata-containers/runtime/${runtimeRevision}/versions.yaml"
-	GO_VERSION="$(curl -fsSL "$runtimeVersionsURL" | $yq r - "languages.golang.version")"
+		local kata_versions_file="${GOPATH}/src/${GO_RUNTIME_PKG}/versions.yaml"
+		info "Get Go version from ${kata_versions_file}"
+		GO_VERSION="$(cat "${kata_versions_file}"  | $yq r - "languages.golang.version")"
+	fi
 
 	[ "$?" == "0" ] && [ "$GO_VERSION" != "null" ]
 }
