@@ -58,6 +58,13 @@ $ cd ${GOPATH}/src/github.com/kata-containers/packaging
 $ git pull
 ```
 1. Bump repositories
+
+   Trigger a [CI job][bump-job] to bump Kata
+
+   http://jenkins.katacontainers.io/blue/organizations/jenkins/release
+
+   or
+
    ```bash
    $ cd ${GOPATH}/src/github.com/kata-containers/packaging/release
    $ export NEW_VERSION=X.Y.Z
@@ -122,8 +129,14 @@ make sure the packages install and work. To help with this you can use the [pack
 If you found any issue during the release process and you fix it, please send it back.
 After your changes are merged, tag Kata packaging with `${NEW_VERSION}` to identify the code used for the release.
 
+   ```bash
+   $ git tag -a "${NEW_VERSION}" -s -m "Kata Containers release ${NEW_VERSION}"
+   $ git push git@github.com:kata-containers/packaging.git 1.8.0-rc0
+   ```
+
 
 [release-process-definition]: https://github.com/kata-containers/documentation/blob/master/Releases.md
 [release-checklist]: https://github.com/kata-containers/documentation/blob/master/Release-Checklist.md
 [join-us-kata]: https://github.com/kata-containers/community#join-us
 [install-go-kata]: https://github.com/kata-containers/documentation/blob/master/Developer-Guide.md#requirements-to-build-individual-components
+[bump-job]: http://jenkins.katacontainers.io/blue/organizations/jenkins/release
