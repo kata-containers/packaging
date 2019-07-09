@@ -72,7 +72,6 @@ bump_kata() {
 	[ -d "${packaging_repo_dir}" ] || git clone "https://${packaging_repo}.git" "${packaging_repo_dir}"
 
 	cd "${packaging_repo_dir}/release"
-	./update-repository-version.sh -p "$new_version" "$branch"
 }
 
 setup() {
