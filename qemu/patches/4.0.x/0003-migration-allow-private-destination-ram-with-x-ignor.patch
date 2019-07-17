@@ -1,7 +1,8 @@
-From b17fbbe55cba95ad323b27c2f9f3e22eb6364d4b Mon Sep 17 00:00:00 2001
+From cddfe6dd0d2c0cd32b08c633e3d43769ede8e44d Mon Sep 17 00:00:00 2001
 From: Peng Tao <tao.peng@linux.alibaba.com>
 Date: Fri, 14 Jun 2019 14:35:13 +0800
-Subject: [PATCH] migration: allow private destination ram with x-ignore-shared
+Subject: [PATCH 3/3] migration: allow private destination ram with
+ x-ignore-shared
 
 By removing the share ram check, qemu is able to migrate
 to private destination ram when x-ignore-shared capability
@@ -44,10 +45,10 @@ Signed-off-by: Juan Quintela <quintela@redhat.com>
  1 file changed, 7 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 8a6ad61d3d..8622b4dc49 100644
+index 1b35b4a30c..4402def6ee 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -3426,7 +3426,6 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+@@ -3382,7 +3382,6 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
          }
          if (migrate_ignore_shared()) {
              qemu_put_be64(f, block->mr->addr);
@@ -55,7 +56,7 @@ index 8a6ad61d3d..8622b4dc49 100644
          }
      }
  
-@@ -4393,12 +4392,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+@@ -4349,12 +4348,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
                      }
                      if (migrate_ignore_shared()) {
                          hwaddr addr = qemu_get_be64(f);
@@ -69,5 +70,5 @@ index 8a6ad61d3d..8622b4dc49 100644
                              block->mr->addr != addr) {
                              error_report("Mismatched GPAs for block %s "
 -- 
-2.17.1
+2.20.1
 
