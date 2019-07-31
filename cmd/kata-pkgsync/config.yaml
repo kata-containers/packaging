@@ -1,0 +1,33 @@
+# Copyright (c) 2019 SUSE LLC
+#
+# SPDX-License-Identifier: Apache-2.0
+
+obsprojects:
+    home:katacontainers:releases:
+
+        releases:
+            - master
+            - stable-1.8
+            - stable-1.7
+
+        architectures:
+            - x86_64
+
+packagecloud:
+    repo: katacontainers/testing
+
+distro-mapping:
+    openSUSE_Leap_15.0: opensuse/15.0
+    openSUSE_Leap_42.3: opensuse/42.3
+    Fedora_29         : fedora/29
+    Fedora_28         : fedora/28
+    Fedora_30         : fedora/30
+    xUbuntu_18.04     : ubuntu/bionic
+    xUbuntu_16.04     : ubuntu/xenial
+    SLE_12_SP3        : sles/12.3
+    Debian_9          : debian/stretch
+    Debian_10         : debian/buster
+    CentOS_7          : el/7
+    RHEL_7            :
+    openSUSE_Tumbleweed:
+
