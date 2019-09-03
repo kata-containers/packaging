@@ -146,6 +146,7 @@ get_major_kernel_version() {
 get_kernel_frag_path() {
 	local arch_path="$1"
 	local common_path="${arch_path}/../common"
+	local modules_path="${arch_path}/modules"
 	local kernel_path="$2"
 	local cmdpath="${kernel_path}/scripts/kconfig/merge_config.sh"
 	local config_path="${arch_path}/.config"
@@ -164,6 +165,11 @@ get_kernel_frag_path() {
 	# handle specific cases, then add the path definition and search/list/cat
 	# here.
 	local all_configs="${common_configs} ${arch_configs}"
+
+	if [ -d "${modules_path}" ]; then
+		local modules_config="$(ls ${modules_path}/*.conf)"
+		all_configs+=" ${modules_config}"
+	fi
 
 	info "Constructing config from fragments: ${config_path}"
 	local results=$(export KCONFIG_CONFIG=${config_path}; \
