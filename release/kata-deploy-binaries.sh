@@ -119,11 +119,11 @@ install_qemu() {
 	tar xf kata-qemu-static.tar.gz -C "${destdir}"
 }
 
-# Install static qemu-virtiofsd asset
-install_qemu_virtiofsd() {
+# Install static qemu-virtiofs asset
+install_qemu_virtiofs() {
 	info "build static qemu-virtiofs"
-	"${script_dir}/../static-build/qemu-virtiofsd/build-static-qemu.sh"
-	info "Install static qemu-virtiofsd"
+	"${script_dir}/../static-build/qemu-virtiofs/build-static-qemu-virtiofs.sh"
+	info "Install static qemu-virtiofs"
 	tar xf kata-qemu-static.tar.gz -C "${destdir}"
 }
 
@@ -217,7 +217,7 @@ main() {
 	install_kata_components
 	install_kernel
 	install_qemu
-	install_qemu_virtiofsd
+	install_qemu_virtiofs
 	install_nemu
 	install_firecracker
 	install_docker_config_script
