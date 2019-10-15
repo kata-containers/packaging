@@ -105,6 +105,9 @@ install_image() {
 	ln -sf "${image}" kata-containers.img
 	ln -sf "${initrd}" kata-containers-initrd.img
 	popd >>/dev/null
+	pushd ${destdir}
+	tar -czvf ../kata-image.tar.gz *
+	popd
 }
 
 #Install kernel asset
@@ -116,6 +119,9 @@ install_kernel() {
 	info "install kernel"
 	DESTDIR="${destdir}" PREFIX="${prefix}" ./kernel/build-kernel.sh install
 	popd
+	pushd ${destdir}
+	tar -czvf ../kata-kernel.tar.gz *
+	popd
 }
 
 #Install experimental kernel asset
@@ -126,6 +132,9 @@ install_experimental_kernel() {
 	./kernel/build-kernel.sh -e build
 	info "install experimental kernel"
 	DESTDIR="${destdir}" PREFIX="${prefix}" ./kernel/build-kernel.sh -e install
+	popd
+	pushd ${destdir}
+	tar -czvf ../kata-kernel-experimental.tar.gz *
 	popd
 }
 
@@ -141,16 +150,12 @@ install_nemu() {
 install_qemu() {
 	info "build static qemu"
 	"${script_dir}/../static-build/qemu/build-static-qemu.sh"
-	info "Install static qemu"
-	tar xf kata-qemu-static.tar.gz -C "${destdir}"
 }
 
 # Install static qemu-virtiofsd asset
 install_qemu_virtiofsd() {
 	info "build static qemu-virtiofs"
 	"${script_dir}/../static-build/qemu-virtiofs/build-static-qemu-virtiofs.sh"
-	info "Install static qemu-virtiofs"
-	tar xf kata-qemu-virtiofs-static.tar.gz -C "${destdir}"
 }
 
 # Install static firecracker asset
@@ -161,7 +166,9 @@ install_firecracker() {
 	mkdir -p "${destdir}/opt/kata/bin/"
 	sudo install -D --owner root --group root --mode 0744  firecracker/firecracker-static "${destdir}/opt/kata/bin/firecracker"
 	sudo install -D --owner root --group root --mode 0744  firecracker/jailer-static "${destdir}/opt/kata/bin/jailer"
-
+	pushd ${destdir}
+	tar -czvf ../kata-firecracker-static.tar.gz *
+	popd
 }
 
 install_docker_config_script() {
@@ -226,6 +233,16 @@ EOT
 	sudo chmod +x kata-qemu-virtiofs
 
 	popd
+	pushd ${destdir}
+	tar -czvf ../kata-components.tar.gz *
+	popd
+}
+
+untar_qemu_binaries() {
+	info "Install static qemu"
+	tar xf kata-qemu-static.tar.gz -C "${destdir}"
+	info "Install static qemu-virtiofs"
+	tar xf kata-qemu-virtiofs-static.tar.gz -C "${destdir}"
 }
 
 main() {
@@ -259,6 +276,8 @@ main() {
 	install_nemu
 	install_firecracker
 	install_docker_config_script
+
+	untar_qemu_binaries
 
 	tarball_name="${destdir}.tar.xz"
 	pushd "${destdir}" >>/dev/null
