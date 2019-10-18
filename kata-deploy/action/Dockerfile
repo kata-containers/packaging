@@ -1,10 +1,10 @@
-FROM microsoft/azure-cli:2.0.47
+FROM microsoft/azure-cli:latest
 
 LABEL version="0.0.0"
 LABEL com.github.actions.name="Test kata-deploy in an AKS cluster"
 LABEL com.github.actions.description="Test kata-deply in an AKS cluster"
 
-ARG AKS_ENGINE_VER="v0.36.4"
+ARG AKS_ENGINE_VER="v0.42.0"
 
 ENV GITHUB_ACTION_NAME="Test kata-deploy in an AKS cluster"
 
