@@ -17,6 +17,7 @@ supported_artifacts=(
   "install_kata_components"
   "install_kernel"
   "install_qemu"
+  "install_nemu"
   "install_qemu_virtiofsd"
 )
 

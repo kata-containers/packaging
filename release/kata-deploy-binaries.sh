@@ -146,8 +146,6 @@ install_experimental_kernel() {
 install_nemu() {
 	info "build static nemu"
 	"${script_dir}/../static-build/nemu/build-static-nemu.sh"
-	info "Install static nemu"
-	tar xf kata-nemu-static.tar.gz -C "${destdir}"
 }
 
 # Install static qemu asset
@@ -246,6 +244,8 @@ EOT
 untar_qemu_binaries() {
 	info "Install static qemu"
 	tar xf kata-qemu-static.tar.gz -C "${destdir}"
+	info "Install static nemu"
+	tar xf kata-nemu-static.tar.gz -C "${destdir}"
 	info "Install static qemu-virtiofs"
 	tar xf kata-qemu-virtiofs-static.tar.gz -C "${destdir}"
 }
