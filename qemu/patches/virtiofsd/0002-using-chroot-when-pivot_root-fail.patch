@@ -1,0 +1,60 @@
+From 693293c8ffad32f51601376f22cd9d9542b782d8 Mon Sep 17 00:00:00 2001
+From: baiyu <baiyu10@baidu.com>
+Date: Tue, 24 Dec 2019 15:24:58 +0800
+Subject: [PATCH] Using chroot instead pivot_root when pivot_root fail.
+ Virtiofsd can't be started on rootfs system, because rootfs don't allow
+ pivot_root. The issue is here: kata-containers/runtime#2067.
+
+Signed-off-by: baiyu <baiyu10@baidu.com>
+---
+ contrib/virtiofsd/passthrough_ll.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthrough_ll.c
+index 5bfd65079f..42cd940a62 100644
+--- a/contrib/virtiofsd/passthrough_ll.c
++++ b/contrib/virtiofsd/passthrough_ll.c
+@@ -2046,6 +2046,7 @@ static void setup_pivot_root(const char *source)
+ {
+ 	int oldroot;
+ 	int newroot;
++	int use_pivot_root = 1;
+ 
+ 	oldroot = open("/", O_DIRECTORY | O_RDONLY | O_CLOEXEC);
+ 	if (oldroot < 0) {
+@@ -2061,20 +2062,25 @@ static void setup_pivot_root(const char *source)
+ 		err(1, "fchdir(newroot)");
+ 	}
+ 
+-	if (syscall(__NR_pivot_root, ".", ".") < 0){
+-		err(1, "pivot_root(., .)");
++	if (syscall(__NR_pivot_root, ".", ".") < 0) {
++		if (chroot(source) < 0) {
++			err(1, "pivot_root(., .) and chroot(%s)", source);
++		}
++		use_pivot_root = 0;
+ 	}
+ 
+ 	if (fchdir(oldroot) < 0) {
+ 		err(1, "fchdir(oldroot)");
+ 	}
+ 
+-	if (mount("", ".", "", MS_SLAVE | MS_REC, NULL) < 0) {
+-		err(1, "mount(., MS_SLAVE | MS_REC)");
+-	}
++	if (use_pivot_root) {
++		if (mount("", ".", "", MS_SLAVE | MS_REC, NULL) < 0) {
++			err(1, "mount(., MS_SLAVE | MS_REC)");
++		}
+ 
+-	if (umount2(".", MNT_DETACH) < 0) {
+-		err(1, "umount2(., MNT_DETACH)");
++		if (umount2(".", MNT_DETACH) < 0) {
++			err(1, "umount2(., MNT_DETACH)");
++		}
+ 	}
+ 
+ 	if (fchdir(newroot) < 0) {
+-- 
+2.21.0 (Apple Git-122)
+
