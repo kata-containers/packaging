@@ -12,7 +12,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${script_dir}/../../scripts/lib.sh"
 
-config_dir="${script_dir}/../../scripts/"
+config_dir="${script_dir}/../.."
 nemu_tar="kata-nemu-static.tar.gz"
 
 nemu_repo="${nemu_repo:-}"
