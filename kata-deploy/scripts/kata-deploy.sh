@@ -142,29 +142,29 @@ function configure_containerd() {
 		cp "$containerd_conf_file" "$containerd_conf_file_backup"
 	fi
 	cat <<EOT | tee -a "$containerd_conf_file"
-[[plugins]]
-  [[plugins.cri]]
-   [[plugins.cri.containerd]]
-     [plugins.cri.containerd.runtimes.kata]
+# [plugins]
+  # [plugins.cri]
+    # [plugins.cri.containerd]
+      [plugins.cri.containerd.runtimes.kata]
         runtime_type = "io.containerd.kata.v2"
         [plugins.cri.containerd.runtimes.kata.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration.toml"
-     [plugins.cri.containerd.runtimes.kata-fc]
+          ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration.toml"
+      [plugins.cri.containerd.runtimes.kata-fc]
         runtime_type = "io.containerd.kata-fc.v2"
         [plugins.cri.containerd.runtimes.kata-fc.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-fc.toml"
-     [plugins.cri.containerd.runtimes.kata-qemu]
+          ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-fc.toml"
+      [plugins.cri.containerd.runtimes.kata-qemu]
         runtime_type = "io.containerd.kata-qemu.v2"
         [plugins.cri.containerd.runtimes.kata-qemu.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-qemu.toml"
-     [plugins.cri.containerd.runtimes.kata-qemu-virtiofs]
+          ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-qemu.toml"
+      [plugins.cri.containerd.runtimes.kata-qemu-virtiofs]
         runtime_type = "io.containerd.kata-qemu-virtiofs.v2"
         [plugins.cri.containerd.runtimes.kata-qemu-virtiofs.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-qemu-virtiofs.toml"
-     [plugins.cri.containerd.runtimes.kata-nemu]
+          ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-qemu-virtiofs.toml"
+      [plugins.cri.containerd.runtimes.kata-nemu]
         runtime_type = "io.containerd.kata-nemu.v2"
         [plugins.cri.containerd.runtimes.kata-nemu.options]
-	      ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-nemu.toml"
+          ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration-nemu.toml"
 EOT
 	#Currently containerd has an assumption on the location of the shimv2 implementation
 	#Until support is added (see https://github.com/containerd/containerd/issues/3073),
