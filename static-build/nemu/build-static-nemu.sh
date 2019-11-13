@@ -14,8 +14,8 @@ source "${script_dir}/../../scripts/lib.sh"
 source "${script_dir}/../qemu.blacklist"
 
 config_dir="${script_dir}/../../scripts/"
-nemu_tar="kata-nemu-static.tar.gz"
-nemu_tmp_tar="kata-nemu-static-tmp.tar.gz"
+nemu_tar="kata-static-nemu.tar.gz"
+nemu_tmp_tar="kata-static-nemu-tmp.tar.gz"
 Dockerfile="Dockerfile"
 
 if [ $# -ne 0 ];then
