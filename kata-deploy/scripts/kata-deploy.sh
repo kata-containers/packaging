@@ -8,9 +8,24 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+stateless_conf_path="/usr/share/defaults"
+
+crio_stateless_conf_file="${stateless_conf_path}/crio/crio.conf"
 crio_conf_file="/etc/crio/crio.conf"
+# Verify if crio config file exists in /etc. If not,
+# use the stateless config file.
+if [ ! -f "$crio_conf_file" ]; then
+	crio_conf_file="$crio_stateless_conf_file"
+fi
 crio_conf_file_backup="${crio_conf_file}.bak"
+
+containerd_stateless_conf_file="${stateless_conf_path}/containerd/config.toml"
 containerd_conf_file="/etc/containerd/config.toml"
+# Verify if containerd config file exists in /etc. If not,
+# use the stateless config file.
+if [ ! -f "$containerd_conf_file" ]; then
+	containerd_conf_file="$containerd_stateless_conf_file"
+fi
 containerd_conf_file_backup="${containerd_conf_file}.bak"
 
 shims=(
