@@ -57,4 +57,4 @@ RUN wget "${NEMU_OVMF}" && mv OVMF.fd /tmp/nemu-static/"${PREFIX}"/share/kata-ne
 RUN mv /tmp/nemu-static/"${PREFIX}"/bin/qemu-system-x86_64 /tmp/nemu-static/"${PREFIX}"/bin/nemu-system-x86_64
 RUN wget "${VIRTIOFSD_RELEASE}/${VIRTIOFSD}" && chmod +x ${VIRTIOFSD} && mv ${VIRTIOFSD} /tmp/nemu-static/"${PREFIX}"/bin/
 
-RUN cd /tmp/nemu-static && tar -czvf kata-nemu-static.tar.gz *
+RUN cd /tmp/nemu-static && tar -czvf kata-static-nemu.tar.gz *

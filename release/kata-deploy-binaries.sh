@@ -110,66 +110,72 @@ install_image() {
 	ln -sf "${initrd}" kata-containers-initrd.img
 	popd >>/dev/null
 	pushd ${destdir}
-	tar -czvf ../kata-image.tar.gz *
+	tar -czvf ../kata-static-image.tar.gz *
 	popd
 }
 
 #Install kernel asset
 install_kernel() {
+	kata_version=${1:-$kata_version}
 	pushd "${script_dir}/../"
 	info "build kernel"
 	./kernel/build-kernel.sh setup
 	./kernel/build-kernel.sh build
 	info "install kernel"
-	DESTDIR="${destdir}" PREFIX="${prefix}" ./kernel/build-kernel.sh install
+	kata_version=$kata_version DESTDIR="${destdir}" PREFIX="${prefix}" ./kernel/build-kernel.sh install
 	popd
 	pushd ${destdir}
-	tar -czvf ../kata-kernel.tar.gz *
+	tar -czvf ../kata-static-kernel.tar.gz *
 	popd
 }
 
 #Install experimental kernel asset
 install_experimental_kernel() {
+	kata_version=${1:-$kata_version}
 	pushd "${script_dir}/../"
 	info "build experimental kernel"
 	./kernel/build-kernel.sh -e setup
 	./kernel/build-kernel.sh -e build
 	info "install experimental kernel"
-	DESTDIR="${destdir}" PREFIX="${prefix}" ./kernel/build-kernel.sh -e install
+	kata_version=$kata_version DESTDIR="${destdir}" PREFIX="${prefix}" ./kernel/build-kernel.sh -e install
 	popd
 	pushd ${destdir}
-	tar -czvf ../kata-kernel-experimental.tar.gz *
+	tar -czvf ../kata-static-experimental-kernel.tar.gz *
 	popd
 }
 
 # Install static nemu asset
 install_nemu() {
+	kata_version=${1:-$kata_version}
 	info "build static nemu"
-	"${script_dir}/../static-build/nemu/build-static-nemu.sh"
+	kata_version=$kata_version "${script_dir}/../static-build/nemu/build-static-nemu.sh"
 }
 
 # Install static qemu asset
 install_qemu() {
+	kata_version=${1:-$kata_version}
 	info "build static qemu"
-	"${script_dir}/../static-build/qemu/build-static-qemu.sh"
+	kata_version=$kata_version "${script_dir}/../static-build/qemu/build-static-qemu.sh"
 }
 
 # Install static qemu-virtiofsd asset
 install_qemu_virtiofsd() {
+	kata_version=${1:-$kata_version}
 	info "build static qemu-virtiofs"
-	"${script_dir}/../static-build/qemu-virtiofs/build-static-qemu-virtiofs.sh"
+	kata_version=$kata_version "${script_dir}/../static-build/qemu-virtiofs/build-static-qemu-virtiofs.sh"
 }
 
 # Install static firecracker asset
 install_firecracker() {
+	kata_version=${1:-$kata_version}
 	info "build static firecracker"
-	[ -f "firecracker/firecracker-static" ] || "${script_dir}/../static-build/firecracker/build-static-firecracker.sh"
+	[ -f "firecracker/firecracker-static" ] || kata_version=$kata_version "${script_dir}/../static-build/firecracker/build-static-firecracker.sh"
 	info "Install static firecracker"
 	mkdir -p "${destdir}/opt/kata/bin/"
 	sudo install -D --owner root --group root --mode 0744  firecracker/firecracker-static "${destdir}/opt/kata/bin/firecracker"
 	sudo install -D --owner root --group root --mode 0744  firecracker/jailer-static "${destdir}/opt/kata/bin/jailer"
 	pushd ${destdir}
-	tar -czvf ../kata-firecracker-static.tar.gz *
+	tar -czvf ../kata-static-firecracker.tar.gz *
 	popd
 }
 
@@ -237,17 +243,17 @@ EOT
 
 	popd
 	pushd ${destdir}
-	tar -czvf ../kata-components.tar.gz *
+	tar -czvf ../kata-static-kata-components.tar.gz *
 	popd
 }
 
 untar_qemu_binaries() {
 	info "Install static qemu"
-	tar xf kata-qemu-static.tar.gz -C "${destdir}"
+	tar xf kata-static-qemu.tar.gz -C "${destdir}"
 	info "Install static nemu"
-	tar xf kata-nemu-static.tar.gz -C "${destdir}"
+	tar xf kata-static-nemu.tar.gz -C "${destdir}"
 	info "Install static qemu-virtiofs"
-	tar xf kata-qemu-virtiofs-static.tar.gz -C "${destdir}"
+	tar xf kata-static-qemu-virtiofsd.tar.gz -C "${destdir}"
 }
 
 main() {
