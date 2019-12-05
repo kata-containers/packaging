@@ -1,0 +1,13 @@
+#! /bin/sh
+# postinst for kata containers image
+
+set -e
+
+if [ "$1" = configure ]; then
+	if ! getent group kvm >/dev/null; then
+		addgroup --system kvm
+	fi
+	chown -R root:kvm /usr/share/kata-containers
+	chmod -R g+rw /usr/share/kata-containers
+fi
+

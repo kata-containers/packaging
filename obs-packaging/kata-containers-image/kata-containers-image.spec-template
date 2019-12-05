@@ -15,6 +15,9 @@ Source1:        LICENSE
 %description
 Kata Containers rootfs image
 
+%pre
+getent group kvm >/dev/null || groupadd -r kvm
+
 %prep
 # Patches
 @RPM_APPLY_PATCHES@
@@ -32,6 +35,8 @@ install -m 0400 -p "${image}" ${ImageDir}/
 install -m 0400 -p "${initrd}"  ${ImageDir}/
 ln -s /usr/share/kata-containers/$(basename "${image}") ${ImageDir}/kata-containers.img
 ln -s /usr/share/kata-containers/$(basename "${initrd}")  ${ImageDir}/kata-containers-initrd.img
+chown -R root:kvm ${ImageDir}
+chmod -R g+rw ${ImageDir}
 
 %files
 %if 0%{?suse_version}
