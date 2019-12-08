@@ -272,7 +272,7 @@ get_config_and_patches() {
 		info "Clone config and patches"
 		patches_path="${default_patches_dir}"
 		if [ ! -d "${patches_path}" ]; then
-			tag="${kata_version:-$NEW_VERSION}"
+			tag="${kata_version}"
 			git clone "https://${patches_repo}.git" "${patches_repo_dir}"
 			pushd "${patches_repo_dir}" >> /dev/null
 			git checkout $tag
