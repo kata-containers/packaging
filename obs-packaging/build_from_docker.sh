@@ -4,7 +4,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-[ -z "${DEBUG}" ] || set -o xtrace
+set -o xtrace
+export DEBUG=true
 
 set -o errexit
 set -o nounset
