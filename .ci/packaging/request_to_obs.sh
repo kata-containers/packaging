@@ -26,6 +26,9 @@ OBS_BRANCH="${OBS_BRANCH:-testing}"
 
 if [ "${CI:-}" == "true" ] && [ "${GITHUB_PR:-}" != "" ]; then
 	OBS_BRANCH="packaging-PR-${GITHUB_PR}"
+	export version_to_package="${BRANCH}"
+else
+	export version_to_package=$(curl -s -L https://raw.githubusercontent.com/kata-containers/runtime/${BRANCH}/VERSION)
 fi
 
 # Push to anywhere, variable used by release scripts to push
@@ -68,11 +71,11 @@ ${gen_versions_cmd} "${BRANCH}"
 
 # print versions just for debug/info
 cat versions.txt
-export NEW_VERSION=$(curl -s -L https://raw.githubusercontent.com/kata-containers/runtime/${BRANCH}/VERSION)
+echo "Kata version: ${version_to_package}"
 create_repo_cmd="./create-repo-branch.sh"
 if [ "${CI:-}" = "true" ]; then
 	create_repo_cmd+=" --ci"
 fi
 create_repo_cmd+=" ${OBS_BRANCH}"
 script -qefc bash -c "${create_repo_cmd}"
-script -qefc bash -c './build_from_docker.sh ${NEW_VERSION}'
+script -qefc bash -c './build_from_docker.sh ${version_to_package}'
