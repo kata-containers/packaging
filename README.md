@@ -1,4 +1,4 @@
-# Kata Containers packaging
+# Kata Containers  packaging
 
 * [Introduction](#introduction)
 * [Build using OBS](#build-using-obs)
