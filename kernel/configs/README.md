@@ -1,7 +1,9 @@
 * [Kata Containers kernel config files](#kata-containers-kernel-config-files)
-   * [Types of config files](#types-of-config-files)
-   * [How to use config files](#how-to-use-config-files)
-   * [How to modify config files](#how-to-modify-config-files)
+    * [Types of config files](#types-of-config-files)
+    * [How to use config files](#how-to-use-config-files)
+    * [How to modify config files](#how-to-modify-config-files)
+        * [Modifying complete config files](#modifying-complete-config-files)
+        * [Modifying config fragment files](#modifying-config-fragment-files)
 
 # Kata Containers kernel config files
 
@@ -12,7 +14,7 @@ Containers VM kernels.
 
 This directory holds config files for the Kata Linux Kernel in two forms:
 
-- A tree of config file 'fragments' in the `fragments` sub-folder, that are
+- A tree of config file 'fragments' in the [`fragments`](./fragments) sub-folder, that are
   constructed into a complete config file using the kernel
   `scripts/kconfig/merge_config.sh` script.
 - As complete config files that can be used as-is.
@@ -37,6 +39,8 @@ Run `./build-kernel.sh help` for more information.
 
 ## How to modify config files
 
+### Modifying complete config files
+
 Complete config files can be modified either with an editor, or preferably
 using the kernel `Kconfig` configuration tools, for example:
 
@@ -48,6 +52,8 @@ $ popd
 $ cp linux-4.14.22/.config x86_kata_kvm_4.14.x
 ```
 
+### Modifying config fragment files
+
 Kernel fragments are best constructed using an editor. Tools such as `grep` and
 `diff` can help find the differences between two config files to be placed
 into a fragment.
@@ -55,9 +61,15 @@ into a fragment.
 If adding config entries for a new subsystem or feature, consider making a new
 fragment with an appropriately descriptive name.
 
+Generic fragments - that is, those that apply to all architectures, should be placed in
+the [common](./fragments/common) subdirectory. Fragments that are specific to an architecture
+should be placed in that architectures subdirectory, for instance the
+[x86_64](./fragments/x86_64) directory for the `x86_64` architecture.
+
 If you want to disable an entire fragment for a specific architecture, you can add the tag `# !${arch}` in the first line of the fragment. You can also exclude multiple architectures on the same line. Note the `#` at the beginning of the line, this is required to avoid that the tag is interpreted as a configuration.
 Example of valid exclusion:
-```
+
+```bash
 # !s390x !ppc64le
 ```
 

@@ -79,8 +79,8 @@ The script `./build-kernel.sh` tries to apply the patches from
 sets up a kernel. If you want to add a source modification, add a patch on this
 directory.
 
-The script also adds a kernel config file from
-`${GOPATH}/src/github.com/kata-containers/packaging/kernel/configs/` to `.config`
+The script also copies or generates a kernel config file from
+[`${GOPATH}/src/github.com/kata-containers/packaging/kernel/configs/`](./configs) to `.config`
 in the kernel source code. You can modify it as needed.
 
 ## Build the kernel
