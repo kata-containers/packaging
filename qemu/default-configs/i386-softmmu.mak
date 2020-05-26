@@ -1,3 +1,4 @@
+
 # Boards
 CONFIG_ACPI_PCI=y
 CONFIG_I440FX=y
