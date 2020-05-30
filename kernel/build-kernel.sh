@@ -279,7 +279,10 @@ get_default_kernel_config() {
 	if [ -d "${archfragdir}" ]; then
 		config="$(get_kernel_frag_path ${archfragdir} ${kernel_path} ${kernel_arch})"
 	else
-		[ "${hypervisor}" == "firecracker" ] && hypervisor="kvm"
+		# for arm64 firecracker, we use different kernel config with kvm
+		if [ "${hypervisor}" == "firecracker" ] && [ "${arch_target}" != "arm64" ]; then
+			hypervisor="kvm"
+		fi
 		config="${default_kernel_config_dir}/${kernel_arch}_kata_${hypervisor}_${major_kernel}.x"
 	fi
 
@@ -372,7 +375,11 @@ setup_kernel() {
 		patch -p1 --fuzz 0 <"$p"
 	done
 
-	[ -n "${hypervisor_target}" ] || hypervisor_target="kvm"
+	if [ -z "${hypervisor_target}" ]; then
+		info "hypervisor_target (-t) is not specified, use kvm instead"
+		hypervisor_target="kvm"
+	fi
+
 	[ -n "${kernel_config_path}" ] || kernel_config_path=$(get_default_kernel_config "${kernel_version}" "${hypervisor_target}" "${arch_target}" "${kernel_path}")
 
 	info "Copying config file from: ${kernel_config_path}"
