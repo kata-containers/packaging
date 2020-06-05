@@ -177,11 +177,12 @@ get_major_kernel_version() {
 #
 get_kernel_frag_path() {
 	local arch_path="$1"
-	local common_path="${arch_path}/../common"
-	local gpu_path="${arch_path}/../gpu"
+	local common_path="$(realpath ${arch_path}/../common)"
+	local gpu_path="$(realpath ${arch_path}/../gpu)"
 
 	local kernel_path="$2"
 	local arch="$3"
+	local hypervisor="$4"
 	local cmdpath="${kernel_path}/scripts/kconfig/merge_config.sh"
 	local config_path="${arch_path}/.config"
 
@@ -189,6 +190,7 @@ get_kernel_frag_path() {
 	# Exclude configs if they have !$arch tag in the header
 	local common_configs="$(grep "\!${arch}" ${common_path}/*.conf -L)"
 	local experimental_configs="$(ls ${common_path}/experimental/*.conf)"
+	local virtio_mmio_configs="$(ls ${common_path}/mmio.conf)"
 
 	# These are the strings that the kernel merge_config.sh script kicks out
 	# when it reports an error or warning condition. We search for them in the
@@ -211,8 +213,13 @@ get_kernel_frag_path() {
 		all_configs="${all_configs} ${gpu_configs}"
 	fi
 
-	info "Constructing config from fragments: ${config_path}"
+	# for arm64 kvm hypervisor, virtio mmio is not needed.
+	if [ "${hypervisor}" == "kvm" ] && [ "${arch}" == "arm64" ];then
+		all_configs=${all_configs/${virtio_mmio_configs}/}
+	fi
 
+	info "All fragments lists: ${all_configs}"
+	info "Constructing config from fragments: ${config_path}"
 
 	export KCONFIG_CONFIG=${config_path}
 	export ARCH=${arch_target}
@@ -277,7 +284,7 @@ get_default_kernel_config() {
 
 	archfragdir="${default_config_frags_dir}/${kernel_arch}"
 	if [ -d "${archfragdir}" ]; then
-		config="$(get_kernel_frag_path ${archfragdir} ${kernel_path} ${kernel_arch})"
+		config="$(get_kernel_frag_path ${archfragdir} ${kernel_path} ${kernel_arch} ${hypervisor})"
 	else
 		# for arm64 firecracker, we use different kernel config with kvm
 		if [ "${hypervisor}" == "firecracker" ] && [ "${arch_target}" != "arm64" ]; then
