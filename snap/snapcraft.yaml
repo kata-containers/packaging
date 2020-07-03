@@ -359,7 +359,8 @@ parts:
         ;;
 
         *)
-          branch="$(curl -sSL ${versions_url} | ${yq} r - assets.hypervisor.qemu.tag)"
+          # Issue: https://github.com/kata-containers/packaging/issues/1092
+          branch="v4.1.1" #"$(curl -sSL ${versions_url} | ${yq} r - assets.hypervisor.qemu.tag)"
           url="$(curl -sSL ${versions_url} | ${yq} r - assets.hypervisor.qemu.url)"
           patch_dir="${SNAPCRAFT_STAGE}/qemu/patches/$(echo ${branch} | cut -d. -f1-2 | tr -d v).x"
           commit=""
