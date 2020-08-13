@@ -16,7 +16,7 @@
 ## Introduction
 
 Kata Containers currently supports packages for many distributions. Tooling to
-aid in creating these packages are contained within this repository.
+aid in creating these packages are Contained within this repository.
 
 ## Build using OBS
 
