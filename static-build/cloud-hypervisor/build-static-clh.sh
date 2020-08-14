@@ -36,6 +36,6 @@ repo_dir="${repo_dir//.git}"
 cd "${repo_dir}"
 git fetch || true
 git checkout "${cloud_hypervisor_version}"
-"${script_dir}/docker-build/build.sh"
+./scripts/dev_cli.sh build --release --libc musl
 rm -f cloud-hypervisor
-cp ./target/release/cloud-hypervisor .
+cp build/cargo_target/$(uname -m)-unknown-linux-musl/release/cloud-hypervisor .
