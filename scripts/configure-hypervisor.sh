@@ -262,7 +262,6 @@ generate_qemu_options() {
 	qemu_options+=(size:--disable-snappy)
 
 	# Disable unused security options
-	qemu_options+=(security:--disable-seccomp)
 	qemu_options+=(security:--disable-tpm)
 
 	# Disable userspace network access ("-net user")
