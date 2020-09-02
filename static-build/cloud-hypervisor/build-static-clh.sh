@@ -36,6 +36,15 @@ repo_dir="${repo_dir//.git}"
 cd "${repo_dir}"
 git fetch || true
 git checkout "${cloud_hypervisor_version}"
-"${script_dir}/docker-build/build.sh"
-rm -f cloud-hypervisor
-cp ./target/release/cloud-hypervisor .
+static_url="${cloud_hypervisor_repo}"
+static_url="${static_url//.git}"
+static_url="${static_url}/releases/download/${cloud_hypervisor_version}/cloud-hypervisor-static"
+info "Try to pull from ${static_url}"
+if curl --fail -L "${static_url}" -o "cloud-hypervisor";then
+	info "pull hypervisor from release"
+else
+	info "build from source"
+	"${script_dir}/docker-build/build.sh"
+	rm -f cloud-hypervisor
+	cp ./target/release/cloud-hypervisor .
+fi
