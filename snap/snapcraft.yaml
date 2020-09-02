@@ -39,6 +39,10 @@ parts:
     build-packages:
       - curl
     override-build: |
+      set -x
+      echo "#####"
+      git status
+      git remove -v
       yq_path="yq"
       yq_pkg="github.com/mikefarah/yq"
       goos="linux"
@@ -83,6 +87,10 @@ parts:
     plugin: nil
     build-attributes: [no-patchelf]
     override-build: |
+      set -x
+      echo "#####"
+      git status
+      git remove -v
       kata_version=$(cat ${SNAPCRAFT_STAGE}/kata_version)
       pkg_name=runtime
 
