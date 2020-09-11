@@ -1,0 +1,84 @@
+From 66246641609b3cbfc87e805ded1f018b5c9cecf4 Mon Sep 17 00:00:00 2001
+From: Jianyong Wu <jianyong.wu@arm.com>
+Date: Fri, 10 Jul 2020 18:15:48 +0800
+Subject: [PATCH] 9p: retrieve fid from file when file instance exist.
+
+In the current setattr implementation in 9p, fid is always retrieved
+from dentry no matter file instance exists or not. If so, there may be
+some info related to opened file instance dropped. So it's better
+to retrieve fid from file instance when it is passed to setattr.
+
+for example:
+fd=open("tmp", O_RDWR);
+ftruncate(fd, 10);
+
+The file context related with the fd will be lost as fid is always
+retrieved from dentry, then the backend can't get the info of
+file context. It is against the original intention of user and
+may lead to bug.
+
+Link: http://lkml.kernel.org/r/20200710101548.10108-1-jianyong.wu@arm.com
+Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
+---
+ fs/9p/vfs_inode.c      | 9 +++++++--
+ fs/9p/vfs_inode_dotl.c | 9 +++++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
+index c9255d399917..cd004dee2214 100644
+--- a/fs/9p/vfs_inode.c
++++ b/fs/9p/vfs_inode.c
+@@ -1090,7 +1090,7 @@ static int v9fs_vfs_setattr(struct dentry *dentry, struct iattr *iattr)
+ {
+ 	int retval;
+ 	struct v9fs_session_info *v9ses;
+-	struct p9_fid *fid;
++	struct p9_fid *fid = NULL;
+ 	struct p9_wstat wstat;
+ 
+ 	p9_debug(P9_DEBUG_VFS, "\n");
+@@ -1100,7 +1100,12 @@ static int v9fs_vfs_setattr(struct dentry *dentry, struct iattr *iattr)
+ 
+ 	retval = -EPERM;
+ 	v9ses = v9fs_dentry2v9ses(dentry);
+-	fid = v9fs_fid_lookup(dentry);
++	if (iattr->ia_valid & ATTR_FILE) {
++		fid = iattr->ia_file->private_data;
++		WARN_ON(!fid);
++	}
++	if (!fid)
++		fid = v9fs_fid_lookup(dentry);
+ 	if(IS_ERR(fid))
+ 		return PTR_ERR(fid);
+ 
+diff --git a/fs/9p/vfs_inode_dotl.c b/fs/9p/vfs_inode_dotl.c
+index 60328b21c5fb..0028eccb665a 100644
+--- a/fs/9p/vfs_inode_dotl.c
++++ b/fs/9p/vfs_inode_dotl.c
+@@ -540,7 +540,7 @@ static int v9fs_mapped_iattr_valid(int iattr_valid)
+ int v9fs_vfs_setattr_dotl(struct dentry *dentry, struct iattr *iattr)
+ {
+ 	int retval;
+-	struct p9_fid *fid;
++	struct p9_fid *fid = NULL;
+ 	struct p9_iattr_dotl p9attr;
+ 	struct inode *inode = d_inode(dentry);
+ 
+@@ -560,7 +560,12 @@ int v9fs_vfs_setattr_dotl(struct dentry *dentry, struct iattr *iattr)
+ 	p9attr.mtime_sec = iattr->ia_mtime.tv_sec;
+ 	p9attr.mtime_nsec = iattr->ia_mtime.tv_nsec;
+ 
+-	fid = v9fs_fid_lookup(dentry);
++	if (iattr->ia_valid & ATTR_FILE) {
++		fid = iattr->ia_file->private_data;
++		WARN_ON(!fid);
++	}
++	if (!fid)
++		fid = v9fs_fid_lookup(dentry);
+ 	if (IS_ERR(fid))
+ 		return PTR_ERR(fid);
+ 
+-- 
+2.17.1
+
