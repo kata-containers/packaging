@@ -3,8 +3,6 @@
 # required in kata and may have CVEs.
 #
 qemu_black_list=(
-*/bin/qemu-pr-helper
-*/bin/virtfs-proxy-helper
 */libexec/
 */share/*/applications/
 */share/*/*.dtb
