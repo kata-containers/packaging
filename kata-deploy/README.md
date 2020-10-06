@@ -125,7 +125,7 @@ spec:
       runtimeClassName: kata-qemu
 ```
 
-The following YAML snippet shows how to specify a runtime class with Kata for Firecracker:
+The following YAML snippet shows how to specify a runtime class with use Kata for Firecracker:
 
 ```yaml
 spec:
