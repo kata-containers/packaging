@@ -373,7 +373,10 @@ generate_qemu_options() {
 		qemu_options+=(size:--disable-cloop)
 		qemu_options+=(size:--disable-dmg)
 		qemu_options+=(size:--disable-parallels)
-		qemu_options+=(size:--disable-vxhs)
+		# vxhs has been deprecated since qemu 5.1
+		if [ $(echo "${qemu_version_major}.${qemu_version_minor} < 5.1" | bc) == 1 ]; then
+			qemu_options+=(size:--disable-vxhs)
+		fi
 	fi
 
 	#---------------------------------------------------------------------
