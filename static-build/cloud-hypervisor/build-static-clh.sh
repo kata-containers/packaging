@@ -36,6 +36,14 @@ repo_dir="${repo_dir//.git}"
 cd "${repo_dir}"
 git fetch || true
 git checkout "${cloud_hypervisor_version}"
+
+curl -L https://github.com/cloud-hypervisor/cloud-hypervisor/commit/c4fc5e503f33258e71a53ce1dc6bb42f44e823d8.patch -o p.patch
+git apply p.patch
+
+if command -v podman; then
+	export DOCKER_RUNTIME=podman
+fi
+
 ./scripts/dev_cli.sh build --release --libc musl
 rm -f cloud-hypervisor
 cp build/cargo_target/$(uname -m)-unknown-linux-musl/release/cloud-hypervisor .
