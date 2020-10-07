@@ -27,7 +27,7 @@ The `kata-deploy` container image makes use of a script, `kata-deploy-docker`, f
 Kata artifacts and configuration of Docker to utilize the runtime. The following volumes are required to be mounted
 to aid in this:
 - `/opt/kata`: this is where all Kata artifacts are installed on the system
-- `/var/run/dbus`, `/run/systemd`: this is require for reloading the the Docker service
+- `/var/run/dbus`, `/run/systemd`: this is required for reloading the Docker service
 - `/etc/docker`: this is required for updating `daemon.json` in order to configure the Kata runtimes in Docker
 
 
@@ -44,7 +44,7 @@ QEMU and Firecracker, respectively, for the VM isolation layer.
 
 ### Run a sample workload utilizing Kata containers
 
-Run a QEMU QEMU isolated Kata container:
+Run a QEMU isolated Kata container:
 
 ```sh
 $ docker run --runtime=kata-qemu -itd alpine
@@ -93,7 +93,7 @@ is defined through a custom resource definition. For Kubernetes 1.13:
   $ kubectl apply -f https://raw.githubusercontent.com/kata-containers/packaging/master/kata-deploy/k8s-1.13/runtimeclass-crd.yaml
 ```
 
-In order to use a workload Kata with QEMU, first add a `RuntimeClass` as:
+To use a workload with Kata for QEMU, first add a `RuntimeClass` as:
 - For Kubernetes 1.14:
   ```sh
   $ kubectl apply -f https://raw.githubusercontent.com/kata-containers/packaging/master/kata-deploy/k8s-1.14/kata-qemu-runtimeClass.yaml
@@ -105,7 +105,7 @@ In order to use a workload Kata with QEMU, first add a `RuntimeClass` as:
   ```
 
 
-In order to use a workload Kata with Firecracker, first add a `RuntimeClass` as:
+To use a workload with Kata for Firecracker, first add a `RuntimeClass` as:
 - For Kubernetes 1.14:
   ```sh
   $ kubectl apply -f https://raw.githubusercontent.com/kata-containers/packaging/master/kata-deploy/k8s-1.14/kata-fc-runtimeClass.yaml
@@ -116,7 +116,7 @@ In order to use a workload Kata with Firecracker, first add a `RuntimeClass` as:
   $ kubectl apply -f https://raw.githubusercontent.com/kata-containers/packaging/master/kata-deploy/k8s-1.13/kata-fc-runtimeClass.yaml
   ```
 
-The following YAML snippet shows how to specify a workload should use Kata with QEMU:
+The following YAML snippet shows how to specify a runtime class with Kata for QEMU:
 
 ```yaml
 spec:
@@ -125,7 +125,7 @@ spec:
       runtimeClassName: kata-qemu
 ```
 
-The following YAML snippet shows how to specify a workload should use Kata with Firecracker:
+The following YAML snippet shows how to specify a runtime class with use Kata for Firecracker:
 
 ```yaml
 spec:
