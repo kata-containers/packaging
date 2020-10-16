@@ -324,7 +324,7 @@ parts:
     after: [scripts-dump, qemu-patches-dump, qemu-aarch64-patches-dump, yq, qemu-configs-dump]
     build-packages:
       - gcc
-      - python
+      - python3
       - zlib1g-dev
       - libcap-ng-dev
       - libglib2.0-dev
