@@ -20,51 +20,18 @@ The `build-kernel.sh` script requires an installed Golang version matching the
 
 ## Usage
 
-```
-$ ./build-kernel.sh -h
-Overview:
-
-	Build a kernel for Kata Containers
-
-Description: This script is the *ONLY* to build a kernel for development.
-
-
-Usage:
-
-	build-kernel.sh [options] <command> <argument>
-
-Commands:
-
-- setup
-
-- build
-
-- install
-
-Options:
-
-	-c <path>   : Path to config file to build a the kernel.
-	-d          : Enable bash debug.
-	-e          : Enable experimental kernel.
-	-f          : Enable force generate config when setup.
-	-g <vendor> : GPU vendor, intel or nvidia.
-	-h          : Display this help.
-	-k <path>   : Path to kernel to build.
-	-p <path>   : Path to a directory with patches to apply to kernel.
-	-t          : Hypervisor_target.
-	-v          : Kernel version to use if kernel path not provided.
-```
+Please run `build-kernel.sh -h` for the usage.
 
 Example:
 ```
-$ ./build-kernel.sh -v 4.19.86 -g nvidia -f -d setup
+$ ./build-kernel.sh -v 4.19.86 -b -g nvidia -f -d setup
 ```
 > **Note**
 > - `-v 4.19.86`: Specify the guest kernel version.
+> - `-b`: To enable BPF related features in a guest kernel.
 > - `-g nvidia`: To build a guest kernel supporting Nvidia GPU.
 > - `-f`: The .config file is forced to be generated even if the kernel directory already exists.
 > - `-d`: Enable bash debug mode.
-
 
 ## Setup kernel source code
 
