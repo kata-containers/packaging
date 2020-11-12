@@ -45,6 +45,8 @@ readonly GV_NVIDIA="nvidia"
 
 #Path to kernel directory
 kernel_path=""
+#Add BPF related kernel configs when build kernel
+enable_bpf_kernel_configs="false"
 #Experimental kernel support. Pull from virtio-fs GitLab instead of kernel.org
 experimental_kernel="false"
 #Force generate config when setup
@@ -89,6 +91,7 @@ Commands:
 
 Options:
 
+	-b          : Enable BPF related features in kernel.
 	-c <path>   : Path to config file to build a the kernel.
 	-d          : Enable bash debug.
 	-e          : Enable experimental kernel.
@@ -188,7 +191,11 @@ get_kernel_frag_path() {
 
 	local arch_configs="$(ls ${arch_path}/*.conf)"
 	# Exclude configs if they have !$arch tag in the header
-	local common_configs="$(grep "\!${arch}" ${common_path}/*.conf -L)"
+	local common_configs="$(grep "\!${arch}" ${common_path}/*.conf -L | sed '/bpf.conf/d')"
+	if [ ${enable_bpf_kernel_configs} = "true" ]; then
+		common_configs="$(grep "\!${arch}" ${common_path}/*.conf -L)"
+	fi
+
 	local experimental_configs="$(ls ${common_path}/experimental/*.conf)"
 
 	# These are the strings that the kernel merge_config.sh script kicks out
@@ -428,10 +435,13 @@ install_kata() {
 }
 
 main() {
-	while getopts "a:c:defg:hk:p:t:v:" opt; do
+	while getopts "a:bc:defg:hk:p:t:v:" opt; do
 		case "$opt" in
 			a)
 				arch_target="${OPTARG}"
+				;;
+			b)
+				enable_bpf_kernel_configs="true"
 				;;
 			c)
 				kernel_config_path="${OPTARG}"
