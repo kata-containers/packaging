@@ -1,0 +1,34 @@
+From: Max Reitz <address@hidden>
+
+Currently, setup_mounts() bind-mounts the shared directory without
+MS_REC.  This makes all submounts disappear.
+
+Pass MS_REC so that the guest can see submounts again.
+
+Fixes: 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc
+Signed-off-by: Max Reitz <address@hidden>
+Message-Id: <address@hidden>
+Reviewed-by: Dr. David Alan Gilbert <address@hidden>
+Signed-off-by: Dr. David Alan Gilbert <address@hidden>
+  Changed Fixes to point to the commit with the problem rather than
+          the commit that turned it on
+---
+ tools/virtiofsd/passthrough_ll.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index d7a6474b6e..7873692168 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -2666,7 +2666,7 @@ static void setup_mounts(const char *source)
+     int oldroot;
+     int newroot;
+ 
+-    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
++    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
+         fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, source);
+         exit(1);
+     }
+-- 
+2.26.2
+
