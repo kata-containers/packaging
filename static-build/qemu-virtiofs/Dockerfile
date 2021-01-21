@@ -67,5 +67,5 @@ RUN make -j$(nproc)
 RUN make -j$(nproc) virtiofsd
 RUN make install DESTDIR=/tmp/qemu-virtiofs-static
 RUN mv /tmp/qemu-virtiofs-static/"${PREFIX}"/bin/qemu-system-x86_64 /tmp/qemu-virtiofs-static/"${PREFIX}"/bin/qemu-virtiofs-system-x86_64
-RUN chmod +x virtiofsd && mv virtiofsd /tmp/qemu-virtiofs-static/opt/kata/bin/
+RUN chmod +x virtiofsd && mv virtiofsd "/tmp/qemu-virtiofs-static/${PREFIX}/bin/virtiofsd-experimental"
 RUN cd /tmp/qemu-virtiofs-static && tar -czvf "${QEMU_TARBALL}"  *

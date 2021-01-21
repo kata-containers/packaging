@@ -402,9 +402,11 @@ generate_qemu_options() {
 	# (-fsdev "...,security_model=passthrough,..."), qemu uses a helper
 	# application called virtfs-proxy-helper(1) to make certain 9p
 	# operations safer.
+	# seccomp required by virtiofsd
 	qemu_options+=(functionality:--enable-virtfs)
 	qemu_options+=(functionality:--enable-attr)
 	qemu_options+=(functionality:--enable-cap-ng)
+	qemu_options+=(functionality:--enable-seccomp)
 
 	if [[ "${qemu_version_major}" -ge 4 || ( "${qemu_version_major}" -eq 3  &&  "${qemu_version_minor}" -ge 1 ) ]]; then
 		# AVX2 is enabled by default by x86_64, make sure it's enabled only
