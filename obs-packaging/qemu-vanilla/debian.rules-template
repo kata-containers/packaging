@@ -6,7 +6,7 @@ export LANG=C
 
 override_dh_auto_configure:
 	chmod a+x "../SOURCES/configure-hypervisor.sh"
-	eval "../SOURCES/configure-hypervisor.sh" "qemu-vanilla" | sed -e 's/--enable-libpmem//g' | xargs ./configure --prefix=/usr
+	eval "../SOURCES/configure-hypervisor.sh" "qemu-vanilla" | sed -e 's/--enable-libpmem//g' | sed -e 's/--enable-seccomp//g' | xargs ./configure --prefix=/usr
 override_dh_auto_build:
 	make
 

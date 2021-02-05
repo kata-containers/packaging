@@ -32,10 +32,11 @@ RUN apt-get --no-install-recommends install -y \
 	    libmount-dev \
 	    libpixman-1-dev \
 	    libpmem-dev \
+	    libseccomp-dev \
+	    libseccomp2 \
 	    libselinux1-dev \
 	    libtool \
 	    make \
-	    pkg-config \
 	    pkg-config \
 	    python \
 	    python-dev \
@@ -59,4 +60,8 @@ RUN PREFIX="${PREFIX}" /root/configure-hypervisor.sh -s kata-qemu | xargs ./conf
 
 RUN make -j$(nproc)
 RUN make install DESTDIR=/tmp/qemu-static
+
+RUN make -j$(nproc) virtiofsd
+RUN chmod +x virtiofsd && mv virtiofsd "/tmp/qemu-static/${PREFIX}/bin/"
+
 RUN cd /tmp/qemu-static && tar -czvf "${QEMU_TARBALL}" *
